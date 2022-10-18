@@ -14,6 +14,7 @@
     "vite-plugin-glslify": "^2.0.1"
   },
   "dependencies": {
+    "axis-api": "github:gobelins-axis/axis-api",
     "prettier": "^2.5.1",
     "sass": "^1.49.9",
     "stats.js": "^0.17.0",
