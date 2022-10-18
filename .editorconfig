@@ -1,0 +1,6 @@
+root = true
+
+[*]
+ident_size = 4
+ident_style = tab
+charset = utf-8
