@@ -1,0 +1,101 @@
+$_bp_w: (
+	desktop-lg: 2000px,
+	desktop-md: 1680px,
+	desktop-sm: 1280px,
+	tablet: 987px,
+	tablet-portrait: 987px,
+	tablet-landscape: 987px,
+	tablet-sm: 767px,
+	phone: 576px,
+	phone-landscape: 767px,
+	phone-sm: 400px,
+	phone-xs: 360px,
+);
+
+$_bp_h: (
+	lg: 1400px,
+	md: 1080px,
+	sm: 720px,
+	xs: 480px,
+);
+
+@forward './functions' with (
+	$_bp_w: $_bp_w,
+	$_bp_h: $_bp_h
+);
+
+// WIDTH MIXINS
+@mixin below($max) {
+	@media (max-width: #{ $max - 1px }) {
+		@content;
+	}
+}
+
+@mixin between($min, $max) {
+	@media (min-width: #{ $min }) and (max-width: #{ $max }) {
+		@content;
+	}
+}
+
+@mixin above($min) {
+	@media (min-width: #{ $min + 1px }) {
+		@content;
+	}
+}
+
+// HEIGHT MIXINS
+@mixin below-height($max) {
+	@media (max-height: #{ $max - 1px }) {
+		@content;
+	}
+}
+
+@mixin between-height($min, $max) {
+	@media (min-height: #{ $min }) and (max-height: #{ $max }) {
+		@content;
+	}
+}
+
+@mixin above-height($min) {
+	@media (min-height: #{ $min + 1px }) {
+		@content;
+	}
+}
+
+// HEIGHT + WIDTH MIXINS
+@mixin below-size($maxW, $maxH) {
+	@media (min-width: #{ $maxW + 1px }) and (min-height: #{ $maxH + 1px }) {
+		@content;
+	}
+}
+
+@mixin above-size($minW, $minH) {
+	@media (min-width: #{ $minW + 1px }) and (min-height: #{ $minH + 1px }) {
+		@content;
+	}
+}
+
+// ORIENTATION
+@mixin below-landscape($max) {
+	@media (max-width: #{ $max - 1px }) and (orientation: landscape) {
+		@content;
+	}
+}
+
+@mixin above-landscape($min) {
+	@media (min-width: #{ $min - 1px }) and (orientation: landscape) {
+		@content;
+	}
+}
+
+@mixin below-portrait($max) {
+	@media (max-width: #{ $max - 1px }) and (orientation: portrait) {
+		@content;
+	}
+}
+
+@mixin above-portrait($min) {
+	@media (min-width: #{ $min - 1px }) and (orientation: portrait) {
+		@content;
+	}
+}
