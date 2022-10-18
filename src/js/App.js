@@ -37,10 +37,10 @@ export default class App {
 		})
 
 		this.mouse = new Mouse()
-		this.raycaster = new Raycaster()
-		this.raycaster.on('raycast', (e) => {
-			console.log('RAYCAST : ', e)
-		})
+		// this.raycaster = new Raycaster()
+		// this.raycaster.on('raycast', (e) => {
+		// 	console.log('RAYCAST : ', e)
+		// })
 	}
 
 	initDebug() {
