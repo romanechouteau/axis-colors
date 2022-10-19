@@ -6,7 +6,7 @@ import {
 	SphereGeometry,
 	Vector2,
 } from 'three'
-import { ColliderDesc, RigidBodyDesc } from '@dimforge/rapier3d-compat'
+import { ColliderDesc, RigidBodyDesc, ActiveEvents, ActiveCollisionTypes } from '@dimforge/rapier3d-compat'
 
 import { BLOCK_DEPTH, BLOCK_HEIGHT } from './Blocks/Block'
 import { COLORS } from '.'
@@ -48,7 +48,7 @@ export default class Player {
 	initModel() {
 		const geometry = new SphereGeometry(SPHERE_RAY, 32, 16)
 		const material = new MeshBasicMaterial({
-			color: COLORS[this.id === 1 ? 2 : 1],
+			color: COLORS[this.id === 1 ? 2 : 1]
 		})
 		const sphere = new Mesh(geometry, material)
 
@@ -75,7 +75,10 @@ export default class Player {
 			.lockRotations()
 		this.playerBody = this.physicsWorld.createRigidBody(rigidBody)
 
-		const collider = ColliderDesc.ball(SPHERE_RAY).setDensity(1)
+		const collider = ColliderDesc.ball(SPHERE_RAY)
+			.setDensity(1)
+			.setActiveEvents(ActiveEvents.COLLISION_EVENTS)
+			.setActiveCollisionTypes(ActiveCollisionTypes.DEFAULT | ActiveCollisionTypes.KINEMATIC_FIXED)
 		this.physicsWorld.createCollider(collider, this.playerBody)
 	}
 

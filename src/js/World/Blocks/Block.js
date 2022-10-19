@@ -17,7 +17,7 @@ export const BLOCK_TYPE_LIST = Object.keys(BLOCK_TYPE)
 // TYPE DIMENSIONS
 export const BLOCK_DIMENSIONS = {
 	[BLOCK_TYPE.normal]: 1,
-	[BLOCK_TYPE.tunnel]: 6,
+	[BLOCK_TYPE.tunnel]: 10,
 	[BLOCK_TYPE.platform]: 3,
 	[BLOCK_TYPE.empty]: 1,
 	[BLOCK_TYPE.empty_plateform]: 6,
@@ -33,8 +33,11 @@ export const BLOCK_HEIGHT = 2
 export default class Block {
 	constructor(options) {
 		this.type = options.type
+		this.time = options.time
+		this.assets = options.assets
 		this.position = options.position
 		this.physicsWorld = options.physicsWorld
+		this.playerManager = options.playerManager
 
 		this.geometries = []
 		this.materials = []
@@ -86,13 +89,22 @@ export default class Block {
 		this.createFloor()
 
 		const isLeft = Math.random() > 0.5
-		const tunnel = new Tunnel({ id: 1, isLeft })
-		const tunnel2 = new Tunnel({ id: 2, isLeft: !isLeft })
-		this.container.add(tunnel.container)
-		this.container.add(tunnel2.container)
+		this.tunnels = []
 
-		this.geometries.push(...tunnel.geometries, ...tunnel2.geometries)
-		this.materials.push(...tunnel.materials, ...tunnel2.materials)
+		for (let i = 1; i <= 2; i++) {
+			const tunnel = new Tunnel({
+				id: i,
+				block: this,
+				assets: this.assets,
+				isLeft: i === 1 ? isLeft : !isLeft,
+				physicsWorld: this.physicsWorld
+		 })
+
+			this.tunnels.push(tunnel)
+			this.container.add(tunnel.container)
+			this.geometries.push(...tunnel.geometries)
+			this.materials.push(...tunnel.materials)
+		}
 	}
 
 	initPlatform() {
@@ -158,13 +170,20 @@ export default class Block {
 		})
 		this.materials = []
 
-		this.rigidBodies.forEach((rigidBody) => {
-			console.log(rigidBody)
-			this.physicsWorld.removeRigidBody(rigidBody)
-		})
-		this.rigidBodies = []
+		// this.rigidBodies.forEach((rigidBody) => {
+		// 	this.physicsWorld.removeRigidBody(rigidBody)
+		// })
+		// this.rigidBodies = []
 
 		this.container.clear()
 		this.container.removeFromParent()
+	}
+
+	// COLLISION EVENTS
+
+	collisionEvents(handle1, handle2, started) {
+		if (this.type === BLOCK_TYPE.tunnel) {
+			this.tunnels.forEach(tunnel => tunnel.collisionEvents(handle1, handle2, started))
+		}
 	}
 }

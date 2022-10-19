@@ -10,7 +10,7 @@ export default class AmbientLightSource {
 		// Set up
 		this.container = new Object3D()
 		this.container.name = 'Ambient Light'
-		this.params = { color: 0xffff00 }
+		this.params = { color: 0xffffff }
 
 		this.createAmbientLight()
 

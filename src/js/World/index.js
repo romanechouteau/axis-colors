@@ -18,11 +18,11 @@ import AmbientLightSource from './lights/AmbientLight'
 import PointLightSource from './lights/PointLight'
 import { store } from '../tools/Store'
 import { getRapier } from './Rapier'
-import { World as PhysicsWorld } from '@dimforge/rapier3d-compat'
+import { World as PhysicsWorld, EventQueue } from '@dimforge/rapier3d-compat'
 
 export const COLORS = {
-	1: 0x0000ff,
-	2: 0xff0000,
+	1: 0x29A4E6,
+	2: 0xE6603C,
 }
 
 export default class World {
@@ -45,6 +45,8 @@ export default class World {
 	}
 	async init() {
 		await getRapier()
+		this.eventQueue = new EventQueue(true)
+
 		this.setPhysics()
 
 		this.setSize()
@@ -53,8 +55,8 @@ export default class World {
 		this.setPointLight()
 
 		// this.setCube()
-		this.setBlockManager()
 		this.setPlayerManager()
+		this.setBlockManager()
 
 		this.time.on('tick', () => {
 			this.render()
@@ -91,10 +93,12 @@ export default class World {
 	setBlockManager() {
 		this.blockManager = new BlockManager({
 			time: this.time,
+			assets: this.assets,
 			totalWidth: this.totalWidth,
 			totalHeight: this.totalHeight,
 			physicsWorld: this.physicsWorld,
 			worldPosition: this.container.position,
+			playerManager: this.playerManager
 		})
 		this.container.add(this.blockManager.container)
 	}
@@ -138,18 +142,22 @@ export default class World {
 
 		// DEBUG
 
-		const buffers = this.physicsWorld.debugRender()
-		this.lines.visible = true
-		this.lines.geometry.setAttribute(
-			'position',
-			new BufferAttribute(buffers.vertices, 3)
-		)
-		this.lines.geometry.setAttribute(
-			'color',
-			new BufferAttribute(buffers.colors, 4)
-		)
+		// const buffers = this.physicsWorld.debugRender()
+		// this.lines.visible = true
+		// this.lines.geometry.setAttribute(
+		// 	'position',
+		// 	new BufferAttribute(buffers.vertices, 3)
+		// )
+		// this.lines.geometry.setAttribute(
+		// 	'color',
+		// 	new BufferAttribute(buffers.colors, 4)
+		// )
 
-		this.physicsWorld.step()
+		this.physicsWorld.step(this.eventQueue)
+
+		this.eventQueue.drainCollisionEvents((handle1, handle2, started) => {
+			this.blockManager.collisionEvents(handle1, handle2, started)
+		});
 	}
 
 	// TEST RAPIDE

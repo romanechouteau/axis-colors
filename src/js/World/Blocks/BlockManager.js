@@ -10,10 +10,12 @@ import Block, {
 export default class BlockManager {
 	constructor(options) {
 		this.time = options.time
+		this.assets = options.assets
 		this.totalWidth = options.totalWidth
 		this.totalHeight = options.totalHeight
 		this.physicsWorld = options.physicsWorld
 		this.worldPosition = options.worldPosition
+		this.playerManager = options.playerManager
 
 		this.container = new Object3D()
 		this.currentX = 0
@@ -34,6 +36,7 @@ export default class BlockManager {
 	}
 
 	generateType(first) {
+		// return BLOCK_TYPE.tunnel
 		if (first) return BLOCK_TYPE.normal
 
 		const val = Math.random()
@@ -62,8 +65,11 @@ export default class BlockManager {
 
 			const block = new Block({
 				type,
+				time: this.time,
+				assets: this.assets,
 				position: new Vector3(this.currentX, 0, 0),
 				physicsWorld: this.physicsWorld,
+				playerManager: this.playerManager
 			})
 
 			this.container.add(block.container)
@@ -87,5 +93,9 @@ export default class BlockManager {
 
 		this.generateBlocks()
 		this.destroyBlocks()
+	}
+
+	collisionEvents(handle1, handle2, started) {
+		this.blocks.forEach(block => block.collisionEvents(handle1, handle2, started))
 	}
 }
