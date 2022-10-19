@@ -5,8 +5,14 @@ import {
 	Object3D,
 	SphereGeometry,
 	Vector2,
+	Audio,
 } from 'three'
-import { ColliderDesc, RigidBodyDesc, ActiveEvents, ActiveCollisionTypes } from '@dimforge/rapier3d-compat'
+import {
+	ColliderDesc,
+	RigidBodyDesc,
+	ActiveEvents,
+	ActiveCollisionTypes,
+} from '@dimforge/rapier3d-compat'
 
 import { BLOCK_DEPTH, BLOCK_HEIGHT } from './Blocks/Block'
 import { COLORS } from '.'
@@ -17,10 +23,13 @@ export default class Player {
 	constructor(options) {
 		this.id = options.id
 		this.physicsWorld = options.physicsWorld
+		this.listener = options.listener
+		this.assets = options.assets
 
 		this.container = new Object3D()
 		this.velocity = new Vector2()
 		this.speed = 3
+		this.isFusioned = false
 
 		this.init()
 	}
@@ -32,6 +41,8 @@ export default class Player {
 		this.initModel()
 		this.initPosition()
 		this.initPhysics()
+
+		this.initSounds()
 	}
 
 	initControls() {
@@ -48,7 +59,7 @@ export default class Player {
 	initModel() {
 		const geometry = new SphereGeometry(SPHERE_RAY, 32, 16)
 		const material = new MeshBasicMaterial({
-			color: COLORS[this.id === 1 ? 2 : 1]
+			color: COLORS[this.id === 1 ? 2 : 1],
 		})
 		const sphere = new Mesh(geometry, material)
 
@@ -78,8 +89,25 @@ export default class Player {
 		const collider = ColliderDesc.ball(SPHERE_RAY)
 			.setDensity(1)
 			.setActiveEvents(ActiveEvents.COLLISION_EVENTS)
-			.setActiveCollisionTypes(ActiveCollisionTypes.DEFAULT | ActiveCollisionTypes.KINEMATIC_FIXED)
+			.setActiveCollisionTypes(
+				ActiveCollisionTypes.DEFAULT |
+					ActiveCollisionTypes.KINEMATIC_FIXED
+			)
 		this.physicsWorld.createCollider(collider, this.playerBody)
+	}
+
+	initSounds() {
+		this.s_jump = new Audio(this.listener)
+		this.s_jump.setBuffer(this.assets.sounds.jump)
+		this.s_jump.setVolume(0.2)
+
+		this.s_fusion = new Audio(this.listener)
+		this.s_fusion.setBuffer(this.assets.sounds.fusion)
+		this.s_fusion.setVolume(0.4)
+
+		this.s_defusion = new Audio(this.listener)
+		this.s_defusion.setBuffer(this.assets.sounds.defusion)
+		this.s_defusion.setVolume(0.4)
 	}
 
 	// EVENT HANDLERS
@@ -108,10 +136,17 @@ export default class Player {
 	}
 
 	handleJump() {
+		this.s_jump.play()
 		this.playerBody.applyImpulse({ x: 0.0, y: 0.5, z: 0.0 }, true)
 	}
 
-	handleFusion() {}
+	handleFusion() {
+		if (this.isFusioned) {
+			this.s_defusion.play()
+			return
+		}
+		this.s_fusion.play()
+	}
 
 	// RENDER
 

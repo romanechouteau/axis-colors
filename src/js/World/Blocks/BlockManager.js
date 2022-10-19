@@ -11,6 +11,7 @@ export default class BlockManager {
 	constructor(options) {
 		this.time = options.time
 		this.assets = options.assets
+		this.listener = options.listener
 		this.totalWidth = options.totalWidth
 		this.totalHeight = options.totalHeight
 		this.physicsWorld = options.physicsWorld
@@ -67,9 +68,10 @@ export default class BlockManager {
 				type,
 				time: this.time,
 				assets: this.assets,
+				listener: this.listener,
 				position: new Vector3(this.currentX, 0, 0),
 				physicsWorld: this.physicsWorld,
-				playerManager: this.playerManager
+				playerManager: this.playerManager,
 			})
 
 			this.container.add(block.container)
@@ -96,6 +98,8 @@ export default class BlockManager {
 	}
 
 	collisionEvents(handle1, handle2, started) {
-		this.blocks.forEach(block => block.collisionEvents(handle1, handle2, started))
+		this.blocks.forEach((block) =>
+			block.collisionEvents(handle1, handle2, started)
+		)
 	}
 }

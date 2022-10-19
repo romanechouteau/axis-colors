@@ -35,6 +35,7 @@ export default class Block {
 		this.type = options.type
 		this.time = options.time
 		this.assets = options.assets
+		this.listener = options.listener
 		this.position = options.position
 		this.physicsWorld = options.physicsWorld
 		this.playerManager = options.playerManager
@@ -96,9 +97,10 @@ export default class Block {
 				id: i,
 				block: this,
 				assets: this.assets,
+				listener: this.listener,
 				isLeft: i === 1 ? isLeft : !isLeft,
-				physicsWorld: this.physicsWorld
-		 })
+				physicsWorld: this.physicsWorld,
+			})
 
 			this.tunnels.push(tunnel)
 			this.container.add(tunnel.container)
@@ -183,7 +185,9 @@ export default class Block {
 
 	collisionEvents(handle1, handle2, started) {
 		if (this.type === BLOCK_TYPE.tunnel) {
-			this.tunnels.forEach(tunnel => tunnel.collisionEvents(handle1, handle2, started))
+			this.tunnels.forEach((tunnel) =>
+				tunnel.collisionEvents(handle1, handle2, started)
+			)
 		}
 	}
 }

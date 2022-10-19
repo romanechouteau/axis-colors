@@ -6,7 +6,9 @@ import Player from './Player'
 export default class PlayerManager {
 	constructor(options) {
 		this.time = options.time
+		this.assets = options.assets
 		this.physicsWorld = options.physicsWorld
+		this.listener = options.listener
 
 		this.container = new Object3D()
 		this.players = []
@@ -21,6 +23,8 @@ export default class PlayerManager {
 			const player = new Player({
 				id: i,
 				physicsWorld: this.physicsWorld,
+				listener: this.listener,
+				assets: this.assets,
 			})
 			this.players.push(player)
 			this.container.add(player.container)

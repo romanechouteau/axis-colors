@@ -177,6 +177,20 @@ export default class Loader extends EventEmitter {
 			})
 		}
 
+		const soundsContextMP3 = import.meta.glob('../../sounds/*.mp3')
+		for (const sound in soundsContextMP3) {
+			await soundsContextMP3[sound]().then((tex) => {
+				this.ressourcesList.push({
+					name: sound
+						.split('/sounds/')[1]
+						.split('.')[0]
+						.toLowerCase(),
+					src: window.location.origin + tex.default,
+					type: 'sound',
+				})
+			})
+		}
+
 		if (this.ressourcesList.length > 0) {
 			this.loadRessources(this.ressourcesList)
 		} else {

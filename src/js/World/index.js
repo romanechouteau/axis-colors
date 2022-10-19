@@ -10,6 +10,8 @@ import {
 	SphereGeometry,
 	TorusGeometry,
 	Vector3,
+	AudioListener,
+	Audio,
 } from 'three'
 
 import BlockManager from './Blocks/BlockManager'
@@ -21,8 +23,8 @@ import { getRapier } from './Rapier'
 import { World as PhysicsWorld, EventQueue } from '@dimforge/rapier3d-compat'
 
 export const COLORS = {
-	1: 0x29A4E6,
-	2: 0xE6603C,
+	1: 0x29a4e6,
+	2: 0xe6603c,
 }
 
 export default class World {
@@ -54,7 +56,8 @@ export default class World {
 		this.setAmbientLight()
 		this.setPointLight()
 
-		// this.setCube()
+		this.setAudioPlayer()
+
 		this.setPlayerManager()
 		this.setBlockManager()
 
@@ -79,6 +82,7 @@ export default class World {
 	}
 
 	// LIGHTS
+
 	setAmbientLight() {
 		this.ambientlight = new AmbientLightSource()
 		this.container.add(this.ambientlight.container)
@@ -88,17 +92,31 @@ export default class World {
 		this.container.add(this.light.container)
 	}
 
+	// AUDIO
+
+	setAudioPlayer() {
+		this.listener = new AudioListener()
+		this.camera.camera.add(this.listener)
+
+		const s_backgroundMusic = new Audio(this.listener)
+		s_backgroundMusic.setBuffer(this.assets.sounds.background)
+		s_backgroundMusic.setLoop(true)
+		s_backgroundMusic.setVolume(0.2)
+		s_backgroundMusic.play()
+	}
+
 	// BLOCKS
 
 	setBlockManager() {
 		this.blockManager = new BlockManager({
 			time: this.time,
 			assets: this.assets,
+			listener: this.listener,
 			totalWidth: this.totalWidth,
 			totalHeight: this.totalHeight,
 			physicsWorld: this.physicsWorld,
 			worldPosition: this.container.position,
-			playerManager: this.playerManager
+			playerManager: this.playerManager,
 		})
 		this.container.add(this.blockManager.container)
 	}
@@ -108,7 +126,9 @@ export default class World {
 	setPlayerManager() {
 		this.playerManager = new PlayerManager({
 			time: this.time,
+			assets: this.assets,
 			physicsWorld: this.physicsWorld,
+			listener: this.listener,
 		})
 		this.container.add(this.playerManager.container)
 	}
@@ -157,7 +177,7 @@ export default class World {
 
 		this.eventQueue.drainCollisionEvents((handle1, handle2, started) => {
 			this.blockManager.collisionEvents(handle1, handle2, started)
-		});
+		})
 	}
 
 	// TEST RAPIDE

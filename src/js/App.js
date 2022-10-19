@@ -55,7 +55,6 @@ export default class App {
 			powerPreference: 'high-performance',
 		})
 		this.renderer.outputEncoding = sRGBEncoding
-		this.renderer.gammaFactor = 2.2
 		// Set background color
 		this.renderer.setClearColor(0xffffff, 1)
 		// Set renderer pixel ratio & sizes
@@ -92,7 +91,7 @@ export default class App {
 			time: this.time,
 			debug: this.debug,
 			assets: this.assets,
-			camera: this.camera
+			camera: this.camera,
 		})
 		// Add world to scene
 		this.scene.add(this.world.container)
