@@ -38,6 +38,7 @@ export default class Block {
 
 		this.geometries = []
 		this.materials = []
+		this.rigidBodies = []
 
 		this.container = new Object3D()
 		this.init()
@@ -141,6 +142,7 @@ export default class Block {
 
 		this.geometries.push(geometry)
 		this.materials.push(material)
+		this.rigidBodies.push(rigidBody)
 	}
 
 	// DESTROY
@@ -149,10 +151,18 @@ export default class Block {
 		this.geometries.forEach((geometry) => {
 			geometry.dispose()
 		})
+		this.geometries = []
 
 		this.materials.forEach((material) => {
 			material.dispose()
 		})
+		this.materials = []
+
+		this.rigidBodies.forEach((rigidBody) => {
+			console.log(rigidBody)
+			this.physicsWorld.removeRigidBody(rigidBody)
+		})
+		this.rigidBodies = []
 
 		this.container.clear()
 		this.container.removeFromParent()
