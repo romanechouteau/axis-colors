@@ -1,11 +1,15 @@
 import {
+	BufferAttribute,
+	BufferGeometry,
+	LineBasicMaterial,
+	LineSegments,
 	Mesh,
 	MeshNormalMaterial,
 	MeshPhysicalMaterial,
 	Object3D,
 	SphereGeometry,
 	TorusGeometry,
-	Vector3
+	Vector3,
 } from 'three'
 
 import BlockManager from './BlockManager'
@@ -14,9 +18,7 @@ import AmbientLightSource from './lights/AmbientLight'
 import PointLightSource from './lights/PointLight'
 import { store } from '../tools/Store'
 import { getRapier } from './Rapier'
-import {
-	World as PhysicsWorld,
-} from '@dimforge/rapier3d-compat';
+import { World as PhysicsWorld } from '@dimforge/rapier3d-compat'
 
 export default class World {
 	constructor(options) {
@@ -49,9 +51,9 @@ export default class World {
 		this.setBlockManager()
 		this.setPlayerManager()
 
-    this.time.on('tick', () => {
-      this.render()
-    })
+		this.time.on('tick', () => {
+			this.render()
+		})
 	}
 
 	setLoader() {
@@ -61,13 +63,13 @@ export default class World {
 	}
 
 	setSize() {
-    const cameraZ = this.camera.camera.position.z
-    const aspect = store.resolution.width / store.resolution.height
-    const vFov = this.camera.camera.fov * Math.PI / 180
+		const cameraZ = this.camera.camera.position.z
+		const aspect = store.resolution.width / store.resolution.height
+		const vFov = (this.camera.camera.fov * Math.PI) / 180
 
-    this.totalHeight = 2 * Math.tan(vFov / 2) * cameraZ
-    this.totalWidth = this.totalHeight * aspect
-  }
+		this.totalHeight = 2 * Math.tan(vFov / 2) * cameraZ
+		this.totalWidth = this.totalHeight * aspect
+	}
 
 	// LIGHTS
 	setAmbientLight() {
@@ -80,31 +82,55 @@ export default class World {
 	}
 
 	// BLOCKS
+
 	setBlockManager() {
 		this.blockManager = new BlockManager({
 			totalWidth: this.totalWidth,
 			totalHeight: this.totalHeight,
-			physicsWorld: this.physicsWorld
+			physicsWorld: this.physicsWorld,
 		})
 		this.container.add(this.blockManager.container)
 	}
 
 	// PLAYERS
+
 	setPlayerManager() {
 		this.playerManager = new PlayerManager({
 			time: this.time,
-			physicsWorld: this.physicsWorld
+			physicsWorld: this.physicsWorld,
 		})
 		this.container.add(this.playerManager.container)
 	}
 
 	setPhysics() {
-		const gravity = new Vector3(0.0, -9.81, 0.0);
-    this.physicsWorld = new PhysicsWorld(gravity);
-		console.log(this.physicsWorld)
+		const gravity = new Vector3(0.0, -9.81, 0.0)
+		this.physicsWorld = new PhysicsWorld(gravity)
+
+		// DEBUG
+
+		const geometry = new BufferGeometry()
+		const material = new LineBasicMaterial({
+			color: 0xffffff,
+			vertexColors: true,
+		})
+		this.lines = new LineSegments(geometry, material)
+		this.container.add(this.lines)
 	}
 
 	render() {
+		// DEBUG
+
+		const buffers = this.physicsWorld.debugRender()
+		this.lines.visible = true
+		this.lines.geometry.setAttribute(
+			'position',
+			new BufferAttribute(buffers.vertices, 3)
+		)
+		this.lines.geometry.setAttribute(
+			'color',
+			new BufferAttribute(buffers.colors, 4)
+		)
+
 		this.physicsWorld.step()
 	}
 
