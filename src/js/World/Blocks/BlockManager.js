@@ -9,9 +9,11 @@ import Block, {
 
 export default class BlockManager {
 	constructor(options) {
+		this.time = options.time
 		this.totalWidth = options.totalWidth
 		this.totalHeight = options.totalHeight
 		this.physicsWorld = options.physicsWorld
+		this.worldPosition = options.worldPosition
 
 		this.container = new Object3D()
 		this.currentX = 0
@@ -22,26 +24,13 @@ export default class BlockManager {
 
 	init() {
 		this.initBlocks()
+
+		this.time.on('tick', this.render)
 	}
 
 	initBlocks() {
-		this.currentX = -this.totalWidth * 0.8
-		const maxX = this.totalWidth * 0.8 + BLOCK_WIDTH
-
-		while (this.currentX <= maxX) {
-			const type = this.generateType(this.currentX <= BLOCK_WIDTH * 2)
-
-			const block = new Block({
-				type,
-				position: new Vector3(this.currentX, 0, 0),
-				physicsWorld: this.physicsWorld,
-			})
-
-			this.container.add(block.container)
-
-			this.currentX += BLOCK_DIMENSIONS[type] * BLOCK_WIDTH
-			this.blocks.push(block)
-		}
+		this.currentX = -this.totalWidth
+		this.generateBlocks()
 	}
 
 	generateType(first) {
@@ -63,5 +52,40 @@ export default class BlockManager {
 				return BLOCK_TYPE[possibleTypes[i]]
 			}
 		}
+	}
+
+	generateBlocks() {
+		const maxX = this.totalWidth * 2
+
+		while (this.worldPosition.x + this.currentX <= maxX) {
+			const type = this.generateType(this.currentX <= BLOCK_WIDTH * 2)
+
+			const block = new Block({
+				type,
+				position: new Vector3(this.currentX, 0, 0),
+				physicsWorld: this.physicsWorld,
+			})
+
+			this.container.add(block.container)
+
+			this.currentX += BLOCK_DIMENSIONS[type] * BLOCK_WIDTH
+			this.blocks.push(block)
+		}
+	}
+
+	destroyBlocks() {
+		let x = this.blocks[0].container.position.x
+		while (this.worldPosition.x + x < -this.totalWidth) {
+			const toRemove = this.blocks.shift()
+			toRemove.destroy()
+			x = this.blocks[0].container.position.x
+		}
+	}
+
+	render = () => {
+		if (this.worldPosition.x + this.currentX >= this.totalWidth * 2) return
+
+		this.generateBlocks()
+		this.destroyBlocks()
 	}
 }

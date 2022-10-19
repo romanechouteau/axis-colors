@@ -20,6 +20,9 @@ export default class Tunnel {
 		this.id = options.id
 		this.isLeft = options.isLeft
 
+		this.geometries = []
+		this.materials = []
+
 		this.container = new Object3D()
 
 		this.init()
@@ -47,5 +50,8 @@ export default class Tunnel {
 		this.container.position.z = this.isLeft ? -radius : radius
 
 		this.container.rotation.set(0, 0, Math.PI / 2)
+
+		this.geometries.push(geometry)
+		this.materials.push(material)
 	}
 }

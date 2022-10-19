@@ -36,6 +36,9 @@ export default class Block {
 		this.position = options.position
 		this.physicsWorld = options.physicsWorld
 
+		this.geometries = []
+		this.materials = []
+
 		this.container = new Object3D()
 		this.init()
 	}
@@ -86,6 +89,9 @@ export default class Block {
 		const tunnel2 = new Tunnel({ id: 2, isLeft: !isLeft })
 		this.container.add(tunnel.container)
 		this.container.add(tunnel2.container)
+
+		this.geometries.push(...tunnel.geometries, ...tunnel2.geometries)
+		this.materials.push(...tunnel.materials, ...tunnel2.materials)
 	}
 
 	initPlatform() {
@@ -132,5 +138,23 @@ export default class Block {
 		)
 
 		this.physicsWorld.createCollider(collider, this.floorBody)
+
+		this.geometries.push(geometry)
+		this.materials.push(material)
+	}
+
+	// DESTROY
+
+	destroy() {
+		this.geometries.forEach((geometry) => {
+			geometry.dispose()
+		})
+
+		this.materials.forEach((material) => {
+			material.dispose()
+		})
+
+		this.container.clear()
+		this.container.removeFromParent()
 	}
 }

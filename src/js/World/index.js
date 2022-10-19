@@ -90,9 +90,11 @@ export default class World {
 
 	setBlockManager() {
 		this.blockManager = new BlockManager({
+			time: this.time,
 			totalWidth: this.totalWidth,
 			totalHeight: this.totalHeight,
 			physicsWorld: this.physicsWorld,
+			worldPosition: this.container.position,
 		})
 		this.container.add(this.blockManager.container)
 	}
@@ -122,7 +124,18 @@ export default class World {
 		this.container.add(this.lines)
 	}
 
+	updateWorldPosition() {
+		const currentX = Math.min(
+			this.playerManager.players[0].container.position.x,
+			this.playerManager.players[1].container.position.x
+		)
+
+		this.container.position.x = -currentX
+	}
+
 	render() {
+		this.updateWorldPosition()
+
 		// DEBUG
 
 		const buffers = this.physicsWorld.debugRender()
