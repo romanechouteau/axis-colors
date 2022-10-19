@@ -1,4 +1,8 @@
 import { BoxGeometry, Mesh, MeshNormalMaterial, Object3D } from 'three'
+import {
+  ColliderDesc,
+  RigidBodyDesc,
+} from '@dimforge/rapier3d-compat';
 
 export const BLOCK_TYPE = {
   'normal': 0,
@@ -32,6 +36,7 @@ export default class Block {
 	constructor(options) {
     this.type = options.type
     this.position = options.position
+    this.physicsWorld = options.physicsWorld
 
 		this.container = new Object3D()
 		this.init()
@@ -98,9 +103,20 @@ export default class Block {
   // OBJECT CREATION
 
   createFloor() {
-    const geometry = new BoxGeometry(BLOCK_WIDTH * BLOCK_DIMENSIONS[this.type], BLOCK_HEIGHT, BLOCK_DEPTH)
+    const width = BLOCK_WIDTH * BLOCK_DIMENSIONS[this.type]
+
+    const geometry = new BoxGeometry(width, BLOCK_HEIGHT, BLOCK_DEPTH)
 		const material = new MeshNormalMaterial({})
 		const cube = new Mesh(geometry, material)
 		this.container.add(cube)
+
+
+    const rigidBody = RigidBodyDesc.fixed()
+    .setTranslation(this.container.position.x, this.container.position.y, this.container.position.z)
+    this.floorBody = this.physicsWorld.createRigidBody(rigidBody);
+
+    const collider = ColliderDesc.cuboid(width * 0.5, BLOCK_HEIGHT * 0.5, BLOCK_DEPTH * 0.5)
+
+    this.physicsWorld.createCollider(collider, this.floorBody);
   }
 }

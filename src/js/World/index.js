@@ -4,7 +4,8 @@ import {
 	MeshPhysicalMaterial,
 	Object3D,
 	SphereGeometry,
-	TorusGeometry
+	TorusGeometry,
+	Vector3
 } from 'three'
 
 import BlockManager from './BlockManager'
@@ -12,6 +13,10 @@ import PlayerManager from './PlayerManager'
 import AmbientLightSource from './lights/AmbientLight'
 import PointLightSource from './lights/PointLight'
 import { store } from '../tools/Store'
+import { getRapier } from './Rapier'
+import {
+	World as PhysicsWorld,
+} from '@dimforge/rapier3d-compat';
 
 export default class World {
 	constructor(options) {
@@ -31,7 +36,10 @@ export default class World {
 
 		this.setLoader()
 	}
-	init() {
+	async init() {
+		await getRapier()
+		this.setPhysics()
+
 		this.setSize()
 
 		this.setAmbientLight()
@@ -40,7 +48,12 @@ export default class World {
 		// this.setCube()
 		this.setBlockManager()
 		this.setPlayerManager()
+
+    this.time.on('tick', () => {
+      this.render()
+    })
 	}
+
 	setLoader() {
 		this.assets.on('ressourcesReady', () => {
 			this.init()
@@ -70,7 +83,8 @@ export default class World {
 	setBlockManager() {
 		this.blockManager = new BlockManager({
 			totalWidth: this.totalWidth,
-			totalHeight: this.totalHeight
+			totalHeight: this.totalHeight,
+			physicsWorld: this.physicsWorld
 		})
 		this.container.add(this.blockManager.container)
 	}
@@ -78,9 +92,20 @@ export default class World {
 	// PLAYERS
 	setPlayerManager() {
 		this.playerManager = new PlayerManager({
-			time: this.time
+			time: this.time,
+			physicsWorld: this.physicsWorld
 		})
 		this.container.add(this.playerManager.container)
+	}
+
+	setPhysics() {
+		const gravity = new Vector3(0.0, -9.81, 0.0);
+    this.physicsWorld = new PhysicsWorld(gravity);
+		console.log(this.physicsWorld)
+	}
+
+	render() {
+		this.physicsWorld.step()
 	}
 
 	// TEST RAPIDE

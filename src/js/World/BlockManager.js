@@ -6,6 +6,7 @@ export default class BlockManager {
 	constructor(options) {
     this.totalWidth = options.totalWidth
     this.totalHeight = options.totalHeight
+    this.physicsWorld = options.physicsWorld
 
     this.container = new Object3D()
     this.currentX = 0
@@ -27,7 +28,8 @@ export default class BlockManager {
 
       const block = new Block({
         type,
-        position: new Vector3(this.currentX, 0, 0)
+        position: new Vector3(this.currentX, 0, 0),
+        physicsWorld: this.physicsWorld
       })
 
       this.container.add(block.container)

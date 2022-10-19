@@ -6,6 +6,7 @@ import Player from "./Player"
 export default class PlayerManager {
 	constructor(options) {
     this.time = options.time
+    this.physicsWorld = options.physicsWorld
 
     this.container = new Object3D()
     this.players = []
@@ -18,7 +19,8 @@ export default class PlayerManager {
 
     for (let i = 1; i <= 2; i++) {
       const player = new Player({
-        id: i
+        id: i,
+			  physicsWorld: this.physicsWorld
       })
       this.players.push(player)
       this.container.add(player.container)

@@ -1,5 +1,10 @@
 import Axis from "axis-api"
 import { Mesh, MeshNormalMaterial, Object3D, SphereGeometry, Vector3 } from "three"
+import {
+  ColliderDesc,
+  CoefficientCombineRule,
+  RigidBodyDesc,
+} from '@dimforge/rapier3d-compat';
 
 import { BLOCK_DEPTH, BLOCK_HEIGHT } from "./Block"
 
@@ -8,6 +13,7 @@ const SPHERE_RAY = 0.3
 export default class Player {
 	constructor(options) {
     this.id = options.id
+    this.physicsWorld = options.physicsWorld
 
     this.container = new Object3D()
     this.position = new Vector3(0, 0, 0)
@@ -22,6 +28,7 @@ export default class Player {
     this.initControls()
     this.initModel()
     this.initPosition()
+    this.initPhysics()
   }
 
   initControls() {
@@ -31,7 +38,7 @@ export default class Player {
       buttons: Axis.buttonManager.getButtonsById(this.id),
     })
 
-    this.player.addEventListener("joystick:move", this.handleMove);
+    // this.player.addEventListener("joystick:move", this.handleMove);
   }
 
   initModel() {
@@ -52,6 +59,22 @@ export default class Player {
     this.container.position.copy(this.position)
   }
 
+  initPhysics() {
+    const rigidBody = RigidBodyDesc.dynamic()
+    .setTranslation(this.container.position.x, this.container.position.y, this.container.position.z)
+    .setLinearDamping(0.1)
+    .setLinvel(1., 0, 0)
+    this.playerBody = this.physicsWorld.createRigidBody(rigidBody);
+
+    const collider = ColliderDesc.ball(SPHERE_RAY)
+    .setFriction(0.1)
+    .setFrictionCombineRule(CoefficientCombineRule.Max)
+    .setRestitution(0.6)
+    .setRestitutionCombineRule(CoefficientCombineRule.Max);
+
+    this.physicsWorld.createCollider(collider, this.playerBody);
+  }
+
   // EVENT HANDLERS
 
   handleMove = (e) => {
@@ -66,6 +89,8 @@ export default class Player {
   // RENDER
 
   render() {
-    this.container.position.lerp(this.position, 0.3)
+    // this.container.position.lerp(this.position, 0.3)
+    const t = this.playerBody.translation()
+    this.container.position.set(t.x, t.y, t.z)
   }
 }
