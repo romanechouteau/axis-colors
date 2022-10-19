@@ -25,8 +25,8 @@ export const BLOCK_DIMENSIONS = {
 
 // BLOCK DIMENSIONS
 export const BLOCK_WIDTH = 1
-const BLOCK_DEPTH = 3
-const BLOCK_HEIGHT = 2
+export const BLOCK_DEPTH = 3
+export const BLOCK_HEIGHT = 2
 
 export default class Block {
 	constructor(options) {

@@ -8,8 +8,10 @@ import {
 } from 'three'
 
 import BlockManager from './BlockManager'
+import PlayerManager from './PlayerManager'
 import AmbientLightSource from './lights/AmbientLight'
 import PointLightSource from './lights/PointLight'
+import { store } from '../tools/Store'
 
 export default class World {
 	constructor(options) {
@@ -30,17 +32,29 @@ export default class World {
 		this.setLoader()
 	}
 	init() {
+		this.setSize()
+
 		this.setAmbientLight()
 		this.setPointLight()
 
 		// this.setCube()
 		this.setBlockManager()
+		this.setPlayerManager()
 	}
 	setLoader() {
 		this.assets.on('ressourcesReady', () => {
 			this.init()
 		})
 	}
+
+	setSize() {
+    const cameraZ = this.camera.camera.position.z
+    const aspect = store.resolution.width / store.resolution.height
+    const vFov = this.camera.camera.fov * Math.PI / 180
+
+    this.totalHeight = 2 * Math.tan(vFov / 2) * cameraZ
+    this.totalWidth = this.totalHeight * aspect
+  }
 
 	// LIGHTS
 	setAmbientLight() {
@@ -54,8 +68,19 @@ export default class World {
 
 	// BLOCKS
 	setBlockManager() {
-		this.blockManager = new BlockManager({ camera: this.camera })
+		this.blockManager = new BlockManager({
+			totalWidth: this.totalWidth,
+			totalHeight: this.totalHeight
+		})
 		this.container.add(this.blockManager.container)
+	}
+
+	// PLAYERS
+	setPlayerManager() {
+		this.playerManager = new PlayerManager({
+			time: this.time
+		})
+		this.container.add(this.playerManager.container)
 	}
 
 	// TEST RAPIDE

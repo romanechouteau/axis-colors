@@ -1,4 +1,5 @@
 import { Object3D, PerspectiveCamera, Vector3 } from 'three'
+
 import { store } from './tools/Store'
 
 export default class Camera {
@@ -23,7 +24,7 @@ export default class Camera {
 	setCamera() {
 		// Create camera
 		this.camera = new PerspectiveCamera(
-			75,
+			50,
 			store.resolution.width / store.resolution.height,
 			0.1,
 			1000
@@ -40,8 +41,8 @@ export default class Camera {
 	setPosition() {
 		// Set camera position
 		this.camera.position.x = 0
-		this.camera.position.y = 3
-		this.camera.position.z = 3
+		this.camera.position.y = 5
+		this.camera.position.z = 4
 	}
 	setLookAt() {
 		this.lookat = new Vector3(0, 0, -2)

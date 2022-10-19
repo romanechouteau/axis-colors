@@ -26,15 +26,12 @@ export default class App {
 		this.setRenderer()
 		this.setCamera()
 		this.initDebug()
-		this.setWorld()
 		this.initEvents()
+		this.setWorld()
 	}
 
 	initEvents() {
 		this.keyboard = new Keyboard()
-		this.keyboard.on('key', (e) => {
-			console.log(e)
-		})
 
 		this.mouse = new Mouse()
 		// this.raycaster = new Raycaster()
