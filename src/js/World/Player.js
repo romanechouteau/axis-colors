@@ -1,5 +1,5 @@
 import Axis from "axis-api"
-import { Mesh, MeshNormalMaterial, Object3D, SphereGeometry } from "three"
+import { Mesh, MeshNormalMaterial, Object3D, SphereGeometry, Vector3 } from "three"
 
 import { BLOCK_DEPTH, BLOCK_HEIGHT } from "./Block"
 
@@ -10,6 +10,8 @@ export default class Player {
     this.id = options.id
 
     this.container = new Object3D()
+    this.position = new Vector3(0, 0, 0)
+    this.speed = 0.08
 
     this.init()
 	}
@@ -19,6 +21,7 @@ export default class Player {
   init() {
     this.initControls()
     this.initModel()
+    this.initPosition()
   }
 
   initControls() {
@@ -37,13 +40,16 @@ export default class Player {
 		const sphere = new Mesh(geometry, material)
 
     this.container.add(sphere)
+  }
 
+  initPosition() {
     const z = BLOCK_DEPTH * 0.25
-    this.container.position.set(
+    this.position.set(
       0,
       BLOCK_HEIGHT * 0.5 + SPHERE_RAY,
       this.id === 1 ? z : - z
     )
+    this.container.position.copy(this.position)
   }
 
   // EVENT HANDLERS
@@ -53,6 +59,13 @@ export default class Player {
 
     if (position.x === 0 && position.y === 0) return
 
-    console.log('player ', this.id, position)
+    this.position.x += position.x * this.speed
+    this.position.z += position.y * this.speed * -1
+  }
+
+  // RENDER
+
+  render() {
+    this.container.position.lerp(this.position, 0.3)
   }
 }

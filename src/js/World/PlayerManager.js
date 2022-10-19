@@ -23,16 +23,26 @@ export default class PlayerManager {
       this.players.push(player)
       this.container.add(player.container)
     }
+
+    this.time.on('tick', () => {
+      this.render()
+    })
   }
 
   initEmulator() {
-    const gamepadEmulator = Axis.createGamepadEmulator(0)
+    this.gamepadEmulator = Axis.createGamepadEmulator(0)
 
-    this.time.on('tick', () => {
-      gamepadEmulator.update()
-    })
+    Axis.joystick1.setGamepadEmulatorJoystick(this.gamepadEmulator, 0)
+    Axis.joystick2.setGamepadEmulatorJoystick(this.gamepadEmulator, 1)
+  }
 
-    Axis.joystick1.setGamepadEmulatorJoystick(gamepadEmulator, 0)
-    Axis.joystick2.setGamepadEmulatorJoystick(gamepadEmulator, 1)
+  // RENDER
+
+  render() {
+    if (this.gamepadEmulator) {
+      this.gamepadEmulator.update()
+    }
+
+    this.players.forEach(player => player.render())
   }
 }
