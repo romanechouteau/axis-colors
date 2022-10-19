@@ -1,14 +1,15 @@
 import Axis from 'axis-api'
 import {
 	Mesh,
-	MeshNormalMaterial,
+	MeshBasicMaterial,
 	Object3D,
 	SphereGeometry,
 	Vector2,
 } from 'three'
 import { ColliderDesc, RigidBodyDesc } from '@dimforge/rapier3d-compat'
 
-import { BLOCK_DEPTH, BLOCK_HEIGHT } from './Block'
+import { BLOCK_DEPTH, BLOCK_HEIGHT } from './Blocks/Block'
+import { COLORS } from '.'
 
 const SPHERE_RAY = 0.3
 
@@ -46,7 +47,9 @@ export default class Player {
 
 	initModel() {
 		const geometry = new SphereGeometry(SPHERE_RAY, 32, 16)
-		const material = new MeshNormalMaterial({})
+		const material = new MeshBasicMaterial({
+			color: COLORS[this.id === 1 ? 2 : 1],
+		})
 		const sphere = new Mesh(geometry, material)
 
 		this.container.add(sphere)

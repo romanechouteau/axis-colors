@@ -1,5 +1,6 @@
 import { BoxGeometry, Mesh, MeshNormalMaterial, Object3D } from 'three'
 import { ColliderDesc, RigidBodyDesc } from '@dimforge/rapier3d-compat'
+import Tunnel from './Tunnel'
 
 export const BLOCK_TYPE = {
 	normal: 0,
@@ -16,7 +17,7 @@ export const BLOCK_TYPE_LIST = Object.keys(BLOCK_TYPE)
 // TYPE DIMENSIONS
 export const BLOCK_DIMENSIONS = {
 	[BLOCK_TYPE.normal]: 1,
-	[BLOCK_TYPE.tunnel]: 4,
+	[BLOCK_TYPE.tunnel]: 6,
 	[BLOCK_TYPE.platform]: 3,
 	[BLOCK_TYPE.empty]: 1,
 	[BLOCK_TYPE.empty_plateform]: 6,
@@ -79,6 +80,12 @@ export default class Block {
 
 	initTunnel() {
 		this.createFloor()
+
+		const isLeft = Math.random() > 0.5
+		const tunnel = new Tunnel({ id: 1, isLeft })
+		const tunnel2 = new Tunnel({ id: 2, isLeft: !isLeft })
+		this.container.add(tunnel.container)
+		this.container.add(tunnel2.container)
 	}
 
 	initPlatform() {

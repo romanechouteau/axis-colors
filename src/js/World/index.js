@@ -12,13 +12,18 @@ import {
 	Vector3,
 } from 'three'
 
-import BlockManager from './BlockManager'
+import BlockManager from './Blocks/BlockManager'
 import PlayerManager from './PlayerManager'
 import AmbientLightSource from './lights/AmbientLight'
 import PointLightSource from './lights/PointLight'
 import { store } from '../tools/Store'
 import { getRapier } from './Rapier'
 import { World as PhysicsWorld } from '@dimforge/rapier3d-compat'
+
+export const COLORS = {
+	1: 0x0000ff,
+	2: 0xff0000,
+}
 
 export default class World {
 	constructor(options) {
