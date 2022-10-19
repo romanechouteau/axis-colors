@@ -18,8 +18,8 @@ export default class Player {
 		this.physicsWorld = options.physicsWorld
 
 		this.container = new Object3D()
-		this.speed = 2
 		this.velocity = new Vector2()
+		this.speed = 3
 
 		this.init()
 	}
@@ -41,6 +41,7 @@ export default class Player {
 		})
 
 		this.player.addEventListener('joystick:move', this.handleMove)
+		this.player.addEventListener('keydown', this.handleKeyDown)
 	}
 
 	initModel() {
@@ -67,11 +68,11 @@ export default class Player {
 				this.container.position.y,
 				this.container.position.z
 			)
-			.setLinvel(0, -1, 0)
+			.setLinvel(0, 0, 0)
 			.lockRotations()
 		this.playerBody = this.physicsWorld.createRigidBody(rigidBody)
 
-		const collider = ColliderDesc.ball(SPHERE_RAY)
+		const collider = ColliderDesc.ball(SPHERE_RAY).setDensity(1)
 		this.physicsWorld.createCollider(collider, this.playerBody)
 	}
 
@@ -88,17 +89,36 @@ export default class Player {
 		)
 			return
 
-		this.velocity.set(position.x * this.speed, position.y * -this.speed)
-
-		this.playerBody.setLinvel(
-			{ x: this.velocity.x, y: -1.0, z: this.velocity.y },
-			true
-		)
+		this.velocity.x = position.x * this.speed
+		this.velocity.y = position.y * -this.speed
 	}
+
+	handleKeyDown = (e) => {
+		if (e.key === 'a') {
+			this.handleJump()
+		} else if (e.key === 'w') {
+			this.handleFusion()
+		}
+	}
+
+	handleJump() {
+		this.playerBody.applyImpulse({ x: 0.0, y: 0.5, z: 0.0 }, true)
+	}
+
+	handleFusion() {}
 
 	// RENDER
 
 	render() {
+		this.playerBody.setLinvel(
+			{
+				x: this.velocity.x,
+				y: this.playerBody.linvel().y,
+				z: this.velocity.y,
+			},
+			true
+		)
+
 		const t = this.playerBody.translation()
 		this.container.position.set(t.x, t.y, t.z)
 	}
