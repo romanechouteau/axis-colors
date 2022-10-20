@@ -1,3 +1,4 @@
+import gsap from 'gsap'
 import Axis from 'axis-api'
 import {
 	Object3D,
@@ -20,6 +21,7 @@ import { BLOCK_DEPTH, BLOCK_HEIGHT } from './Blocks/Block'
 import { store } from '../Tools/Store'
 
 export const SPHERE_RAY = 0.3
+const CONTAINER_SCALE = 0.3
 
 export default class Player {
 	constructor(options) {
@@ -34,6 +36,7 @@ export default class Player {
 		this.speed = 3
 
 		this.keyEvent = new Emitter()
+		this.joystickEvent = new Emitter()
 
 		this.init()
 	}
@@ -56,7 +59,7 @@ export default class Player {
 			buttons: Axis.buttonManager.getButtonsById(this.id),
 		})
 
-		this.player.addEventListener('joystick:move', this.handleMove)
+		this.player.addEventListener('joystick:move', this.handleJoystickMove)
 		this.player.addEventListener('keydown', this.handleKeyDown)
 	}
 
@@ -77,7 +80,7 @@ export default class Player {
 		this.initAnimations()
 
 		this.container.add(this.player)
-		this.container.scale.set(0.3, 0.3, 0.3)
+		this.container.scale.set(CONTAINER_SCALE, CONTAINER_SCALE, CONTAINER_SCALE)
 	}
 
 	initAnimations() {
@@ -129,9 +132,31 @@ export default class Player {
 
 	// EVENT HANDLERS
 
-	handleMove = (e) => {
+	handleJoystickMove = (e) => {
 		const position = e.position
 
+		if (store.isFusion) {
+			this.joystickEvent.trigger('move', [position])
+			return
+		}
+
+		this.handleMove(position)
+	}
+
+	handleKeyDown = (e) => {
+		switch (e.key) {
+			case 'a':
+				if (store.hasLost) this.handleRestart()
+				else if (store.isFusion) this.keyEvent.trigger('keydown', [e.key])
+				else if (store.started) this.handleJump()
+				break
+			case 'w':
+				this.keyEvent.trigger('keydown', [e.key])
+				break;
+		}
+	}
+
+	handleMove(position) {
 		if (
 			position.x === 0 &&
 			position.y === 0 &&
@@ -150,26 +175,43 @@ export default class Player {
 		this.velocity.y = position.y * -this.speed
 	}
 
-	handleKeyDown = (e) => {
-		switch (e.key) {
-			case 'a':
-				if (store.hasLost) this.handleRestart()
-				else if (store.isFusion) this.keyEvent.trigger('keydown', [e.key])
-				else if (store.started) this.handleJump()
-				break
-			case 'w':
-				this.keyEvent.trigger('keydown', [e.key])
-				break;
-		}
-	}
-
 	handleJump() {
 		this.s_jump.play()
 		this.playerBody.applyImpulse({ x: 0.0, y: 0.5, z: 0.0 }, true)
 	}
 
-	handleFusion() {
-		console.log('fusion')
+	handleFusion(position) {
+		const offset = this.id === 1 ? 1 : 3
+
+		console.log(this.container.scale)
+		this.scale = CONTAINER_SCALE
+
+		gsap.timeline()
+			.to(this, {
+			scale: 0,
+			duration: 0.5,
+			onUpdate: () => {
+				this.container.scale.set(this.scale, this.scale, this.scale)
+			},
+			onComplete:() => {
+				this.playerBody.setTranslation(
+				{
+					x: position.x,
+					y: BLOCK_HEIGHT * 0.5 + SPHERE_RAY * offset,
+					z: position.z
+				}, true)
+			}
+		})
+		.to(this, {
+			scale: CONTAINER_SCALE,
+			duration: 0.5,
+			onUpdate: () => {
+				this.container.scale.set(this.scale, this.scale, this.scale)
+			},
+		})
+	}
+
+	handleDefusion() {
 	}
 
 	handleRestart() {

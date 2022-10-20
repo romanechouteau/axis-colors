@@ -16,6 +16,7 @@
   "dependencies": {
     "@dimforge/rapier3d-compat": "^0.9.0",
     "axis-api": "github:gobelins-axis/axis-api",
+    "gsap": "^3.11.3",
     "prettier": "^2.5.1",
     "sass": "^1.49.9",
     "stats.js": "^0.17.0",
