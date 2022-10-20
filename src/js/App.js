@@ -1,4 +1,8 @@
-import { Scene, sRGBEncoding, WebGLRenderer } from 'three'
+import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass';
+import { ShaderPass } from 'three/examples/jsm/postprocessing/ShaderPass.js';
+import { EffectComposer } from './PostProcess/EffectComposer';
+import { GammaCorrectionShader } from 'three/examples/jsm/shaders/GammaCorrectionShader.js';
+import { Scene, sRGBEncoding, WebGLRenderer, ShaderMaterial } from 'three'
 
 import Camera from './Camera'
 import World from './World'
@@ -8,6 +12,9 @@ import Mouse from './Tools/Mouse'
 import Debug from './Tools/Debug'
 
 import Keyboard from './Tools/Keyboard'
+
+import dangerVertShader from '../shaders/dangerVert.glsl'
+import dangerFragShader from '../shaders/dangerFrag.glsl'
 
 export default class App {
 	static instance
@@ -24,6 +31,7 @@ export default class App {
 		console.log('✨ Init app ✨')
 		this.setRenderer()
 		this.setCamera()
+		this.setPostProcessing()
 		this.initDebug()
 		this.initEvents()
 		this.setWorld()
@@ -63,9 +71,38 @@ export default class App {
 				store.resolution.height
 			)
 		})
+	}
+
+	setPostProcessing() {
+		this.composer = new EffectComposer(this.renderer)
+
+		const renderScene = new RenderPass(this.scene, this.camera.camera)
+
+		const gammaCorrection = new ShaderPass(GammaCorrectionShader)
+
+		this.dangerPass = new ShaderPass(
+      new ShaderMaterial({
+        uniforms: {
+          baseTexture: {
+            value: null
+          },
+					uProgress: {
+						value: 0
+					}
+        },
+        vertexShader: dangerVertShader,
+        fragmentShader: dangerFragShader,
+        defines: {}
+      }), "baseTexture"
+    )
+    this.dangerPass.needsSwap = true
+
+		this.composer.addPass(renderScene)
+		this.composer.addPass(gammaCorrection)
+		this.composer.addPass(this.dangerPass)
 
 		this.time.on('tick', () => {
-			this.renderer.render(this.scene, this.camera.camera)
+			this.composer.render()
 			if (this.raycaster) this.raycaster.update()
 			if (this.debug.stats) this.debug.stats.update()
 		})
@@ -89,6 +126,7 @@ export default class App {
 			debug: this.debug,
 			assets: this.assets,
 			camera: this.camera,
+			dangerPass: this.dangerPass
 		})
 		// Add world to scene
 		this.scene.add(this.world.container)

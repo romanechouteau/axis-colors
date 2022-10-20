@@ -3,18 +3,14 @@ import {
 	BufferGeometry,
 	LineBasicMaterial,
 	LineSegments,
-	Mesh,
-	MeshNormalMaterial,
-	MeshPhysicalMaterial,
 	Object3D,
-	SphereGeometry,
-	TorusGeometry,
 	Vector3,
 	AudioListener,
 	Audio,
 } from 'three'
 
 import BlockManager from './Blocks/BlockManager'
+import DangerManager from './DangerManager'
 import PlayerManager from './PlayerManager'
 import AmbientLightSource from './lights/AmbientLight'
 import PointLightSource from './lights/PointLight'
@@ -34,6 +30,7 @@ export default class World {
 		this.debug = options.debug
 		this.assets = options.assets
 		this.camera = options.camera
+		this.dangerPass = options.dangerPass
 
 		// Set up
 		this.container = new Object3D()
@@ -60,6 +57,7 @@ export default class World {
 
 		this.setPlayerManager()
 		this.setBlockManager()
+		this.setDangerManager()
 
 		this.setTimer()
 
@@ -134,6 +132,21 @@ export default class World {
 		})
 		this.container.add(this.playerManager.container)
 	}
+
+	// DANGER
+
+	setDangerManager() {
+		this.dangerManager = new DangerManager({
+			time: this.time,
+			camera: this.camera,
+			totalWidth: this.totalWidth,
+			dangerPass: this.dangerPass,
+			worldPosition: this.container.position,
+			playerManager: this.playerManager,
+		})
+	}
+
+	// PHYSICS
 
 	setPhysics() {
 		const gravity = new Vector3(0.0, -9.81, 0.0)
