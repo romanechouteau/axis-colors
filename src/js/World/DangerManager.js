@@ -37,6 +37,8 @@ export default class DangerManager {
   }
 
   checkLoose() {
+    if (store.hasLost) return
+
     const playerX = Math.min(
       this.playerManager.players[0].container.position.x,
       this.playerManager.players[1].container.position.x
