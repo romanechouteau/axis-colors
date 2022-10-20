@@ -1,9 +1,11 @@
+import { ActiveCollisionTypes, ActiveEvents, ColliderDesc, RigidBodyDesc } from '@dimforge/rapier3d-compat'
 import Axis from 'axis-api'
 import { Object3D, Audio } from 'three'
 
 import { store } from '../Tools/Store'
+import { BLOCK_HEIGHT } from './Blocks/Block'
 
-import Player from './Player'
+import Player, { SPHERE_RAY } from './Player'
 
 export default class PlayerManager {
 	constructor(options) {
@@ -22,22 +24,8 @@ export default class PlayerManager {
 
 	init() {
 		this.initEmulator()
-
-		for (let i = 1; i <= 2; i++) {
-			const player = new Player({
-				id: i,
-				time: this.time,
-				assets: this.assets,
-				listener: this.listener,
-				physicsWorld: this.physicsWorld,
-			})
-			this.players.push(player)
-			this.container.add(player.container)
-
-			player.keyEvent.on('keydown', (key) => this.checkSynchro(player.id, key))
-			player.joystickEvent.on('move', (position) => this.checkJoystick(player.id, position))
-		}
-
+		this.initPhysics()
+		this.initPlayers()
 		this.initSounds()
 
 		this.time.on('tick', () => {
@@ -60,6 +48,44 @@ export default class PlayerManager {
 		Axis.registerGamepadEmulatorKeys(this.gamepadEmulator, 7, 'w', 2)
 	}
 
+	initPlayers() {
+		for (let i = 1; i <= 2; i++) {
+			const player = new Player({
+				id: i,
+				time: this.time,
+				assets: this.assets,
+				listener: this.listener,
+				fusionBody: this.fusionBody,
+				physicsWorld: this.physicsWorld,
+			})
+			this.players.push(player)
+			this.container.add(player.container)
+
+			player.keyEvent.on('keydown', (key) => this.checkSynchro(player.id, key))
+			player.joystickEvent.on('move', (position) => this.checkJoystick(player.id, position))
+		}
+
+		this.players[0].fusionEvent.on('fusion', this.handleFusion)
+		this.players[0].fusionEvent.on('defusion', this.handleDefusion)
+	}
+
+	initPhysics() {
+		const rigidBody = RigidBodyDesc.dynamic()
+			.setLinvel(0, 0, 0)
+			.lockRotations()
+		this.fusionBody = this.physicsWorld.createRigidBody(rigidBody)
+
+		const collider = ColliderDesc.cylinder(SPHERE_RAY * 2, SPHERE_RAY)
+			.setDensity(1)
+			.setActiveEvents(ActiveEvents.COLLISION_EVENTS)
+			.setActiveCollisionTypes(
+				ActiveCollisionTypes.DEFAULT |
+					ActiveCollisionTypes.KINEMATIC_FIXED
+			)
+
+		this.physicsWorld.createCollider(collider, this.fusionBody)
+	}
+
 	initSounds() {
 		this.s_fusion = new Audio(this.listener)
 		this.s_fusion.setBuffer(this.assets.sounds.fusion)
@@ -79,14 +105,13 @@ export default class PlayerManager {
 	}
 
 	toggleFusion(value) {
-		if (!store.started) return
+		if (!store.started || store.isFusion === value) return
 
-		const middle = (this.players[0].container.position.x + this.players[1].container.position.x) / 2
 		if (!value) {
 			store.isFusion = value
 			this.s_defusion.play()
 			for (let i = 0; i < 2; i++) {
-				this.players[i].handleDefusion({ x: middle, z: 0 })
+				this.players[i].handleDefusion()
 			}
 			return
 		}
@@ -95,8 +120,28 @@ export default class PlayerManager {
 		this.s_fusion.play()
 
 		for (let i = 0; i < 2; i++) {
-			this.players[i].handleFusion({ x: middle, z: 0 })
+			this.players[i].handleFusion()
 		}
+	}
+
+	handleFusion = () => {
+		const middle = (this.players[0].container.position.x + this.players[1].container.position.x) / 2
+		this.fusionBody
+			.setTranslation({
+				x: middle,
+				y: BLOCK_HEIGHT * 0.5 + SPHERE_RAY * 2,
+				z: 0
+			})
+		this.fusionBody.wakeUp()
+	}
+
+	handleDefusion = () => {
+		this.fusionBody.setTranslation({
+			x: 0,
+			y: 0,
+			z: -10
+		})
+		this.fusionBody.sleep()
 	}
 
 	handleJump() {
@@ -148,12 +193,9 @@ export default class PlayerManager {
 
 	// JOYSTICK HANDLERS
 
-	checkJoystickSameDirection(signsX, signsY) {
-		const sameX = (signsX[0] === signsX[1]) || (signsX[0] === 0 && signsX[1] !== 0)
-			|| (signsX[1] === 0 && signsX[0] !== 0)
-		const sameY = (signsY[0] === signsY[1]) || (signsY[0] === 0 && signsY[1] !== 0)
-			|| (signsY[1] === 0 && signsY[0] !== 0)
-
+	checkJoystickSameDirection(position) {
+		const sameX = Math.abs(position.x - this.firstJoystick.position.x) <= 1
+		const sameY = Math.abs(position.y - this.firstJoystick.position.y) <= 1
 		return sameX && sameY
 	}
 
@@ -166,17 +208,12 @@ export default class PlayerManager {
 				return
 			}
 
-			const signJoyX = Math.sign(joystick.position.x)
-			const signPosX = Math.sign(position.x)
-			const signJoyY = Math.sign(joystick.position.y)
-			const signPosY = Math.sign(position.y)
-
 			if (
-				!this.checkJoystickSameDirection([signJoyX, signPosX], [signJoyY, signPosY])
+				!this.checkJoystickSameDirection(position)
 			) {
 				this.toggleFusion(false)
 			} else {
-				this.handleSyncedJoystick(position, [signJoyX, signPosX], [signJoyY, signPosY])
+				this.handleSyncedJoystick(position)
 			}
 		} else {
 			this.handleFirstJoystick(id, position)
@@ -187,10 +224,13 @@ export default class PlayerManager {
 		this.firstJoystick = { id, position }
 	}
 
-	handleSyncedJoystick(position, signsX, signsY) {
-		const x = Math.max(Math.abs(position.x), Math.abs(this.firstJoystick.position.x)) * signsX[0]
-		const y = Math.max(Math.abs(position.y), Math.abs(this.firstJoystick.position.y)) * signsY[0]
-		console.log('synchronizedd', x, y)
+	handleSyncedJoystick(position) {
+		const x = Math.abs(position.x) >= Math.abs(this.firstJoystick.position.x)
+			? position.x
+			: this.firstJoystick.position.x
+		const y = Math.abs(position.y) >= Math.abs(this.firstJoystick.position.y)
+		? position.y
+		: this.firstJoystick.position.y
 
 		for (let i = 0; i < 2; i++) {
 			this.players[i].handleMove({ x, y })
