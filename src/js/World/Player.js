@@ -246,9 +246,9 @@ export default class Player {
 
 				const offset = this.id === 1 ? SPHERE_RAY : -SPHERE_RAY
 				this.playerBody.setTranslation({
-					x: this.container.position.x + offset,
+					x: this.container.position.x,
 					y: BLOCK_HEIGHT * 0.5 + SPHERE_RAY,
-					z: 0
+					z: offset
 				})
 				this.playerBody.wakeUp()
 			}
