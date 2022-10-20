@@ -29,14 +29,17 @@ export default class Player {
 		this.time = options.time
 		this.assets = options.assets
 		this.listener = options.listener
+		this.fusionBody = options.fusionBody
 		this.physicsWorld = options.physicsWorld
 
 		this.container = new Object3D()
 		this.velocity = new Vector2()
 		this.speed = 3
+		this.isFusion = false
 
 		this.keyEvent = new Emitter()
 		this.joystickEvent = new Emitter()
+		this.fusionEvent = new Emitter()
 
 		this.init()
 	}
@@ -184,34 +187,42 @@ export default class Player {
 
 	handleJump() {
 		this.s_jump.play()
+
+		if (this.isFusion && this.id !== 1) return
+		if (this.isFusion) {
+			this.fusionBody.applyImpulse({ x: 0.0, y: 1.25, z: 0.0 }, true)
+			return
+		}
 		this.playerBody.applyImpulse({ x: 0.0, y: 0.5, z: 0.0 }, true)
 	}
 
-	handleFusion(position) {
-		const offset = this.id === 1 ? 1 : 3
-
-		console.log(this.container.scale)
+	handleFusion() {
 		this.scale = CONTAINER_SCALE
 
 		gsap.timeline()
 			.to(this, {
 			scale: 0,
-			duration: 0.5,
+			duration: 0.25,
+			ease: 'power1.easeIn',
 			onUpdate: () => {
 				this.container.scale.set(this.scale, this.scale, this.scale)
 			},
 			onComplete:() => {
-				this.playerBody.setTranslation(
-				{
-					x: position.x,
-					y: BLOCK_HEIGHT * 0.5 + SPHERE_RAY * offset,
-					z: position.z
-				}, true)
+				this.fusionEvent.trigger('fusion')
+				this.isFusion = true
+
+				this.playerBody.setTranslation({
+					x: 0,
+					y: 0,
+					z: -10
+				})
+				this.playerBody.sleep()
 			}
 		})
 		.to(this, {
 			scale: CONTAINER_SCALE,
-			duration: 0.5,
+			duration: 0.25,
+			ease: 'power1.easeOut',
 			onUpdate: () => {
 				this.container.scale.set(this.scale, this.scale, this.scale)
 			},
@@ -219,6 +230,37 @@ export default class Player {
 	}
 
 	handleDefusion() {
+		this.scale = CONTAINER_SCALE
+
+		gsap.timeline()
+			.to(this, {
+			scale: 0,
+			duration: 0.25,
+			ease: 'power1.easeIn',
+			onUpdate: () => {
+				this.container.scale.set(this.scale, this.scale, this.scale)
+			},
+			onComplete:() => {
+				this.fusionEvent.trigger('defusion')
+				this.isFusion = false
+
+				const offset = this.id === 1 ? SPHERE_RAY : -SPHERE_RAY
+				this.playerBody.setTranslation({
+					x: this.container.position.x + offset,
+					y: BLOCK_HEIGHT * 0.5 + SPHERE_RAY,
+					z: 0
+				})
+				this.playerBody.wakeUp()
+			}
+		})
+		.to(this, {
+			scale: CONTAINER_SCALE,
+			duration: 0.25,
+			ease: 'power1.easeOut',
+			onUpdate: () => {
+				this.container.scale.set(this.scale, this.scale, this.scale)
+			},
+		})
 	}
 
 	handleRestart() {
@@ -234,17 +276,28 @@ export default class Player {
 	// RENDER
 
 	render() {
-		this.playerBody.setLinvel(
-			{
-				x: this.velocity.x,
-				y: this.playerBody.linvel().y,
-				z: this.velocity.y,
-			},
-			true
-		)
+		const currentBody = this.isFusion
+			? this.fusionBody
+			: this.playerBody
 
-		const t = this.playerBody.translation()
-		this.container.position.set(t.x, t.y, t.z)
+		if (!this.isFusion || this.id === 1) {
+			currentBody.setLinvel(
+				{
+					x: this.velocity.x,
+					y: currentBody.linvel().y,
+					z: this.velocity.y,
+				},
+				true
+			)
+		}
+
+		const t = currentBody.translation()
+		const offset = this.isFusion
+			 ? this.id === 1
+			 	? - SPHERE_RAY
+				: SPHERE_RAY
+			 : 0
+		this.container.position.set(t.x, t.y + offset, t.z)
 
 		this.mixer.update(this.time.delta)
 
