@@ -75,7 +75,7 @@ export default class PlayerManager {
 			.lockRotations()
 		this.fusionBody = this.physicsWorld.createRigidBody(rigidBody)
 
-		const collider = ColliderDesc.cylinder(SPHERE_RAY * 2, SPHERE_RAY)
+		const collider = ColliderDesc.capsule(SPHERE_RAY * 2, SPHERE_RAY)
 			.setDensity(1)
 			.setActiveEvents(ActiveEvents.COLLISION_EVENTS)
 			.setActiveCollisionTypes(
@@ -132,7 +132,7 @@ export default class PlayerManager {
 		this.fusionBody
 			.setTranslation({
 				x: middle,
-				y: BLOCK_HEIGHT * 0.5 + SPHERE_RAY * 2,
+				y: BLOCK_HEIGHT * 0.5 + SPHERE_RAY * 2.5,
 				z: 0
 			})
 		this.fusionBody.wakeUp()

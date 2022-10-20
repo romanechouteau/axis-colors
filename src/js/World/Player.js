@@ -21,6 +21,7 @@ import { BLOCK_DEPTH, BLOCK_HEIGHT } from './Blocks/Block'
 import { store } from '../Tools/Store'
 
 export const SPHERE_RAY = 0.3
+export const SPHERE_FEET = 0.1
 const CONTAINER_SCALE = 0.3
 
 export default class Player {
@@ -92,10 +93,12 @@ export default class Player {
 		this.mixer = new AnimationMixer(this.player)
 		this.walkAnim = AnimationClip.findByName(animations, 'walk')
 		this.a_walk = this.mixer.clipAction(this.walkAnim)
+		this.walkSitAnim = AnimationClip.findByName(animations, 'walksit')
+		this.a_walkSit = this.mixer.clipAction(this.walkSitAnim)
 		this.jumpAnim = AnimationClip.findByName(animations, 'jump')
 		this.a_jump = this.mixer.clipAction(this.jumpAnim)
-		this.jumpFusionAnim = AnimationClip.findByName(animations, 'jump')
-		this.a_jumpFusion = this.mixer.clipAction(this.jumpFusionAnim)
+		this.jumpSitAnim = AnimationClip.findByName(animations, 'jumpsit')
+		this.a_jumpSit = this.mixer.clipAction(this.jumpSitAnim)
 	}
 
 	initPosition() {
@@ -118,7 +121,7 @@ export default class Player {
 			.lockRotations()
 		this.playerBody = this.physicsWorld.createRigidBody(rigidBody)
 
-		const collider = ColliderDesc.ball(SPHERE_RAY)
+		const collider = ColliderDesc.ball(SPHERE_RAY + SPHERE_FEET)
 			.setDensity(1)
 			.setActiveEvents(ActiveEvents.COLLISION_EVENTS)
 			.setActiveCollisionTypes(
@@ -176,10 +179,11 @@ export default class Player {
 		)
 			return
 
-		if (!this.a_walk.isRunning()) {
-			this.a_walk.setDuration(1620 / this.speed).play()
+		const animation = this.isFusion && this.id !== 1 ? this.a_walkSit : this.a_walk
+		if (!animation.isRunning()) {
+			animation.setDuration(1620 / this.speed).fadeIn(100).play()
 		} else if (position.x === 0 && position.y === 0) {
-			this.a_walk.stop()
+			animation.fadeOut(100).stop()
 		}
 
 		this.velocity.x = position.x * this.speed
@@ -189,12 +193,18 @@ export default class Player {
 	handleJump() {
 		this.s_jump.play()
 
-		if (this.isFusion && this.id !== 1) return
-		if (this.isFusion) {
-			this.fusionBody.applyImpulse({ x: 0.0, y: 1.25, z: 0.0 }, true)
+		if (this.isFusion && this.id !== 1) {
+			this.a_jumpSit.fadeIn(100).play()
 			return
 		}
-		this.playerBody.applyImpulse({ x: 0.0, y: 0.5, z: 0.0 }, true)
+
+		this.a_jump.fadeIn(100).play()
+
+		if (this.isFusion) {
+			this.fusionBody.applyImpulse({ x: 0.0, y: 1.35, z: 0.0 }, true)
+			return
+		}
+		this.playerBody.applyImpulse({ x: 0.0, y: 0.8, z: 0.0 }, true)
 	}
 
 	handleFusion() {
@@ -244,6 +254,9 @@ export default class Player {
 			onComplete:() => {
 				this.fusionEvent.trigger('defusion')
 				this.isFusion = false
+
+				this.a_jumpSit.stop()
+				this.a_walkSit.stop()
 
 				const offset = this.id === 1 ? SPHERE_RAY : -SPHERE_RAY
 				this.playerBody.setTranslation({
@@ -303,8 +316,8 @@ export default class Player {
 		const t = currentBody.translation()
 		const offset = this.isFusion
 			 ? this.id === 1
-			 	? - SPHERE_RAY
-				: SPHERE_RAY
+			 	? - SPHERE_RAY - SPHERE_FEET
+				: SPHERE_RAY - SPHERE_FEET
 			 : 0
 		this.container.position.set(t.x, t.y + offset, t.z)
 
