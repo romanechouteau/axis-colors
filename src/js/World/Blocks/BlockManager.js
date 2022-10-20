@@ -15,6 +15,7 @@ export default class BlockManager {
 		this.totalWidth = options.totalWidth
 		this.totalHeight = options.totalHeight
 		this.physicsWorld = options.physicsWorld
+		this.dangerManager = options.dangerManager
 		this.worldPosition = options.worldPosition
 		this.playerManager = options.playerManager
 
@@ -91,7 +92,8 @@ export default class BlockManager {
 
 	destroyBlocks() {
 		let x = this.blocks[0].position.x + this.blocks[0].width
-		while (this.worldPosition.x + x < -this.totalWidth) {
+		const maxX = Math.min(-this.totalWidth, this.dangerManager.x + this.worldPosition.x)
+		while (this.worldPosition.x + x < maxX) {
 			const toRemove = this.blocks.shift()
 			toRemove.destroy()
 			x = this.blocks[0].position.x + this.blocks[0].width

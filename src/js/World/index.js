@@ -9,6 +9,7 @@ import {
 	Audio,
 } from 'three'
 
+import Background from './Background'
 import BlockManager from './Blocks/BlockManager'
 import DangerManager from './DangerManager'
 import PlayerManager from './PlayerManager'
@@ -57,8 +58,10 @@ export default class World {
 		this.setAudioPlayer()
 
 		this.setPlayerManager()
-		this.setBlockManager()
 		this.setDangerManager()
+		this.setBlockManager()
+
+		this.setBackground()
 
 		this.setTimer()
 
@@ -118,6 +121,7 @@ export default class World {
 			physicsWorld: this.physicsWorld,
 			worldPosition: this.container.position,
 			playerManager: this.playerManager,
+			dangerManager: this.dangerManager
 		})
 		this.container.add(this.blockManager.container)
 	}
@@ -145,6 +149,19 @@ export default class World {
 			worldPosition: this.container.position,
 			playerManager: this.playerManager,
 		})
+	}
+
+	// BACKGROUND
+
+	setBackground() {
+		this.background = new Background({
+			time: this.time,
+			assets: this.assets,
+			camera: this.camera,
+			totalWidth: this.totalWidth,
+			worldPosition: this.container.position,
+		})
+		this.container.add(this.background.container)
 	}
 
 	// PHYSICS

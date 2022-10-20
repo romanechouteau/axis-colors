@@ -19,7 +19,7 @@ export default class DangerManager {
 		this.x = -this.totalWidth * 0.6
 		this.pos = new Vector3()
 
-		// this.time.on('tick', this.render)
+		this.time.on('tick', this.render)
 	}
 
 	updatePosition() {
@@ -41,6 +41,8 @@ export default class DangerManager {
 	}
 
 	checkLoose() {
+		if (store.hasLost) return
+
 		const playerX = Math.min(
 			this.playerManager.players[0].container.position.x,
 			this.playerManager.players[1].container.position.x
