@@ -209,7 +209,7 @@ export default class Player {
 		this.a_jump.fadeIn(100).play()
 
 		if (this.isFusion) {
-			this.fusionBody.applyImpulse({ x: 0.0, y: 1.35, z: 0.0 }, true)
+			this.fusionBody.applyImpulse({ x: 0.0, y: 2, z: 0.0 }, true)
 			return
 		}
 		this.playerBody.applyImpulse({ x: 0.0, y: 0.8, z: 0.0 }, true)
