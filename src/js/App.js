@@ -3,11 +3,11 @@ import { Scene, sRGBEncoding, WebGLRenderer } from 'three'
 import Camera from './Camera'
 import World from './World'
 
-import { store } from './tools/Store'
-import Mouse from './tools/Mouse'
-import Debug from './tools/Debug'
+import { store } from './Tools/Store'
+import Mouse from './Tools/Mouse'
+import Debug from './Tools/Debug'
 
-import Keyboard from './tools/Keyboard'
+import Keyboard from './Tools/Keyboard'
 
 export default class App {
 	static instance

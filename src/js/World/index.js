@@ -18,7 +18,7 @@ import BlockManager from './Blocks/BlockManager'
 import PlayerManager from './PlayerManager'
 import AmbientLightSource from './lights/AmbientLight'
 import PointLightSource from './lights/PointLight'
-import { store } from '../tools/Store'
+import { store } from '../Tools/Store'
 import { getRapier } from './Rapier'
 import { World as PhysicsWorld, EventQueue } from '@dimforge/rapier3d-compat'
 

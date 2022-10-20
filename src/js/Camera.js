@@ -1,6 +1,6 @@
 import { Object3D, PerspectiveCamera, Vector3 } from 'three'
 
-import { store } from './tools/Store'
+import { store } from './Tools/Store'
 
 export default class Camera {
 	constructor(options) {

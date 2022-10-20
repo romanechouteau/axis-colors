@@ -1,4 +1,4 @@
-import Emitter from '../tools/EventEmitter'
+import Emitter from '../Tools/EventEmitter'
 
 class LivesManager {
 	constructor() {
