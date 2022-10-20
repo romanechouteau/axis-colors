@@ -69,6 +69,7 @@ export default class PlayerManager {
 
 	handleStart() {
 		store.started = true
+		store.startTime = Date.now()
 		document.getElementById('start').style.display = 'none'
 	}
 

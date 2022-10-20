@@ -20,7 +20,8 @@ const store = {
 
 	started: false,
 	hasLost: false,
-	isFusion: false
+	isFusion: false,
+	startTime: null
 }
 
 export { store }

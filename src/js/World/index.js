@@ -61,6 +61,8 @@ export default class World {
 		this.setPlayerManager()
 		this.setBlockManager()
 
+		this.setTimer()
+
 		this.time.on('tick', () => {
 			this.render()
 		})
@@ -148,6 +150,11 @@ export default class World {
 		this.container.add(this.lines)
 	}
 
+	setTimer() {
+		this.timerDiv = document.getElementById('timer')
+		this.updateTimer()
+	}
+
 	updateWorldPosition() {
 		const currentX = Math.min(
 			this.playerManager.players[0].container.position.x,
@@ -157,7 +164,17 @@ export default class World {
 		this.container.position.x = -currentX
 	}
 
+	updateTimer() {
+		if (!this.timerDiv) return
+
+		const time = new Date(this.time.current - store.startTime)
+		this.timerDiv.innerHTML = store.startTime === null
+			? '0'
+			: `${time.getMinutes().toString().padStart(2, '0')}:${time.getSeconds().toString().padStart(2, '0')}:${time.getMilliseconds().toString().padStart(3, '0')}`
+	}
+
 	render() {
+		this.updateTimer()
 		this.updateWorldPosition()
 
 		// DEBUG
