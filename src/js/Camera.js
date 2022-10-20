@@ -41,8 +41,8 @@ export default class Camera {
 	setPosition() {
 		// Set camera position
 		this.camera.position.x = 0
-		this.camera.position.y = 5
-		this.camera.position.z = 4
+		this.camera.position.y = 4
+		this.camera.position.z = 5
 	}
 	setLookAt() {
 		this.lookat = new Vector3(0, 0, -2)

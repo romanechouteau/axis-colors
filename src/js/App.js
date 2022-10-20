@@ -4,7 +4,6 @@ import Camera from './Camera'
 import World from './World'
 
 import { store } from './tools/Store'
-import Raycaster from './tools/Raycasters'
 import Mouse from './tools/Mouse'
 import Debug from './tools/Debug'
 
@@ -34,10 +33,6 @@ export default class App {
 		this.keyboard = new Keyboard()
 
 		this.mouse = new Mouse()
-		// this.raycaster = new Raycaster()
-		// this.raycaster.on('raycast', (e) => {
-		// 	console.log('RAYCAST : ', e)
-		// })
 	}
 
 	initDebug() {
@@ -81,6 +76,7 @@ export default class App {
 			sizes: this.sizes,
 			renderer: this.renderer,
 		})
+
 		// Add camera to scene
 		this.scene.add(this.camera.container)
 	}

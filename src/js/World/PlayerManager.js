@@ -22,9 +22,10 @@ export default class PlayerManager {
 		for (let i = 1; i <= 2; i++) {
 			const player = new Player({
 				id: i,
-				physicsWorld: this.physicsWorld,
-				listener: this.listener,
+				time: this.time,
 				assets: this.assets,
+				listener: this.listener,
+				physicsWorld: this.physicsWorld,
 			})
 			this.players.push(player)
 			this.container.add(player.container)
@@ -54,6 +55,6 @@ export default class PlayerManager {
 			this.gamepadEmulator.update()
 		}
 
-		this.players.forEach((player) => player.render())
+		this.players.forEach((player) => player.render(this.time.delta))
 	}
 }
