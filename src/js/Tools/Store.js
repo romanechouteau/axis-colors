@@ -21,7 +21,10 @@ const store = {
 	started: false,
 	hasLost: false,
 	isFusion: false,
-	startTime: null
+	startTime: null,
+
+	virtualKeyboardOpen: false,
+	canRestart: false,
 }
 
 export { store }

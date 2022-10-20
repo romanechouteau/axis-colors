@@ -33,7 +33,9 @@ export default class PlayerManager {
 			this.players.push(player)
 			this.container.add(player.container)
 
-			player.keyEvent.on('keydown', (key) => this.checkSynchro(player.id, key))
+			player.keyEvent.on('keydown', (key) =>
+				this.checkSynchro(player.id, key)
+			)
 		}
 
 		this.initSounds()
@@ -48,6 +50,9 @@ export default class PlayerManager {
 
 		Axis.joystick1.setGamepadEmulatorJoystick(this.gamepadEmulator, 0)
 		Axis.joystick2.setGamepadEmulatorJoystick(this.gamepadEmulator, 1)
+
+		Axis.registerGamepadEmulatorKeys(this.gamepadEmulator, 2, 'x', 1)
+		Axis.registerGamepadEmulatorKeys(this.gamepadEmulator, 3, 's', 1)
 
 		Axis.registerGamepadEmulatorKeys(this.gamepadEmulator, 4, 'a', 1)
 		Axis.registerGamepadEmulatorKeys(this.gamepadEmulator, 5, 'a', 2)
@@ -127,7 +132,7 @@ export default class PlayerManager {
 			case 'w':
 				if (store.started) this.toggleFusion()
 				else this.handleStart()
-				break;
+				break
 		}
 	}
 

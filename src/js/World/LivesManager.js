@@ -41,21 +41,25 @@ class LivesManager {
 		const input = document.querySelector('input')
 
 		Axis.virtualKeyboard.open()
+		store.virtualKeyboardOpen = true
 
 		Axis.virtualKeyboard.addEventListener('input', (username) => {
 			input.value = username
+			input.innerHTML = username
 		})
 
-		Axis.virtualKeyboard.addEventListener('validate', (username) => {
-			virtualKeyboard.close()
+		Axis.virtualKeyboard.addEventListener('validate', () => {
+			Axis.virtualKeyboard.close()
+			store.virtualKeyboardOpen = false
 			this.leaderboard
 				.postScore({
-					username,
+					username: input.value,
 					value: Date.now() - store.startTime,
 				})
 				.then(() => {
 					// Get all scores
 					this.leaderboard.getScores().then((response) => {
+						store.canRestart = true
 						for (let i = 0; i < response.length; i++) {
 							const resp = response[i]
 							const time = new Date(resp.value)
