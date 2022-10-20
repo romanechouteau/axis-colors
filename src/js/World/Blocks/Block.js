@@ -96,10 +96,11 @@ export default class Block {
 		for (let i = 1; i <= 2; i++) {
 			const tunnel = new Tunnel({
 				id: i,
+				time: this.time,
 				block: this,
 				assets: this.assets,
-				listener: this.listener,
 				isLeft: i === 1 ? isLeft : !isLeft,
+				listener: this.listener,
 				physicsWorld: this.physicsWorld,
 			})
 
@@ -180,15 +181,5 @@ export default class Block {
 
 		this.container.clear()
 		this.container.removeFromParent()
-	}
-
-	// COLLISION EVENTS
-
-	collisionEvents(handle1, handle2, started) {
-		if (this.type === BLOCK_TYPE.tunnel) {
-			this.tunnels.forEach((tunnel) =>
-				tunnel.collisionEvents(handle1, handle2, started)
-			)
-		}
 	}
 }

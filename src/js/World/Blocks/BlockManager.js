@@ -97,10 +97,4 @@ export default class BlockManager {
 		this.generateBlocks()
 		this.destroyBlocks()
 	}
-
-	collisionEvents(handle1, handle2, started) {
-		this.blocks.forEach((block) =>
-			block.collisionEvents(handle1, handle2, started)
-		)
-	}
 }

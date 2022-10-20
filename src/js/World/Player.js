@@ -17,7 +17,7 @@ import {
 import { BLOCK_DEPTH, BLOCK_HEIGHT } from './Blocks/Block'
 import { COLORS } from '.'
 
-const SPHERE_RAY = 0.3
+export const SPHERE_RAY = 0.3
 
 export default class Player {
 	constructor(options) {
