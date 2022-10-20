@@ -105,7 +105,10 @@ export default class PlayerManager {
 	}
 
 	toggleFusion(value) {
-		if (!store.started || store.isFusion === value) return
+		if (
+			!store.started || store.isFusion === value ||
+			this.players[0].inTunnel || this.players[1].inTunnel
+			) return
 
 		if (!value) {
 			store.isFusion = value

@@ -2,6 +2,7 @@ import { Object3D, Audio, MeshStandardMaterial } from 'three'
 import { ColliderDesc, RigidBodyDesc } from '@dimforge/rapier3d-compat'
 
 import LivesManager from '../LivesManager'
+import { store } from '../../Tools/Store'
 import { COLORS } from '../index'
 import { SPHERE_RAY } from '../Player'
 import { BLOCK_DEPTH, BLOCK_HEIGHT } from './Block'
@@ -156,17 +157,21 @@ export default class Tunnel {
 
 		if (inside === false) {
 			if (index === -1) return
+			player.leaveTunnel()
 			this.playersInside.splice(index, 1)
 			return
 		}
 
-		if (index !== -1) return
+		if (index !== -1 || player.inTunnel) return
 
 		this.playersInside.push(player.id)
+		player.enterTunnel()
 		this.handleWrongTunnel(player.id)
 	}
 
 	handleWrongTunnel(id) {
+		if (store.hasLost) return
+
 		if (id !== this.id) {
 			LivesManager.removeLife()
 			this.s_error?.play()

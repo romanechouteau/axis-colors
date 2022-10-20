@@ -36,6 +36,7 @@ export default class Player {
 		this.velocity = new Vector2()
 		this.speed = 3
 		this.isFusion = false
+		this.inTunnel = false
 
 		this.keyEvent = new Emitter()
 		this.joystickEvent = new Emitter()
@@ -271,6 +272,14 @@ export default class Player {
 		if (this.container.position.y < -BLOCK_HEIGHT * 0.5 && !store.hasLost) {
 			LivesManager.loose()
 		}
+	}
+
+	enterTunnel() {
+		this.inTunnel = true
+	}
+
+	leaveTunnel() {
+		this.inTunnel = false
 	}
 
 	// RENDER
