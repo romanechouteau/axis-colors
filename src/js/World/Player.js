@@ -146,13 +146,20 @@ export default class Player {
 	handleKeyDown = (e) => {
 		switch (e.key) {
 			case 'a':
-				if (store.hasLost) this.handleRestart()
-				else if (store.isFusion) this.keyEvent.trigger('keydown', [e.key])
+				if (store.isFusion) this.keyEvent.trigger('keydown', [e.key])
 				else if (store.started) this.handleJump()
+				break
+			case 's':
+				if (
+					store.hasLost &&
+					!store.virtualKeyboardOpen &&
+					store.canRestart
+				)
+					this.handleRestart()
 				break
 			case 'w':
 				this.keyEvent.trigger('keydown', [e.key])
-				break;
+				break
 		}
 	}
 
@@ -219,7 +226,7 @@ export default class Player {
 	}
 
 	checkFall() {
-		if (this.container.position.y < - BLOCK_HEIGHT * 0.5 && !store.hasLost) {
+		if (this.container.position.y < -BLOCK_HEIGHT * 0.5 && !store.hasLost) {
 			LivesManager.loose()
 		}
 	}
@@ -241,7 +248,8 @@ export default class Player {
 
 		this.mixer.update(this.time.delta)
 
-		const elapsed = store.startTime === null ? 0 : this.time.current - store.startTime
+		const elapsed =
+			store.startTime === null ? 0 : this.time.current - store.startTime
 		this.speed = 3 + elapsed * 0.0002
 
 		this.checkFall()

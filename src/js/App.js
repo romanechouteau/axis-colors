@@ -8,8 +8,6 @@ import Camera from './Camera'
 import World from './World'
 
 import { store } from './Tools/Store'
-import Mouse from './Tools/Mouse'
-import Debug from './Tools/Debug'
 
 import Keyboard from './Tools/Keyboard'
 
@@ -29,23 +27,20 @@ export default class App {
 
 		// Set up
 		console.log('✨ Init app ✨')
+
+		// WORLD
 		this.setRenderer()
 		this.setCamera()
 		this.setPostProcessing()
-		this.initDebug()
 		this.initEvents()
 		this.setWorld()
+
+		// UI
 		this.setScreens()
 	}
 
 	initEvents() {
 		this.keyboard = new Keyboard()
-
-		this.mouse = new Mouse()
-	}
-
-	initDebug() {
-		this.debug = new Debug()
 	}
 
 	setRenderer() {
@@ -103,8 +98,6 @@ export default class App {
 
 		this.time.on('tick', () => {
 			this.composer.render()
-			if (this.raycaster) this.raycaster.update()
-			if (this.debug.stats) this.debug.stats.update()
 		})
 	}
 

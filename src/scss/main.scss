@@ -23,7 +23,8 @@
 	}
 }
 
-#start, #end {
+#start,
+#end {
 	position: absolute;
 	top: 0;
 	left: 0;
@@ -32,6 +33,9 @@
 	z-index: 3;
 	color: black;
 	background-color: white;
+	.input {
+		color: black;
+	}
 }
 
 .overlays {
