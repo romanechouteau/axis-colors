@@ -57,8 +57,8 @@ export default class World {
 		this.setAudioPlayer()
 
 		this.setPlayerManager()
-		this.setBlockManager()
 		this.setDangerManager()
+		this.setBlockManager()
 
 		this.setBackground()
 
@@ -120,6 +120,7 @@ export default class World {
 			physicsWorld: this.physicsWorld,
 			worldPosition: this.container.position,
 			playerManager: this.playerManager,
+			dangerManager: this.dangerManager
 		})
 		this.container.add(this.blockManager.container)
 	}
