@@ -46,9 +46,16 @@ export default class BlockManager {
 				: this.blocks[this.blocks.length - 1].type
 
 		const possibleTypes = BLOCK_TYPE_LIST.filter(
-			(key) => (BLOCK_TYPE[key] !== prevType)
-			&& !(prevType === BLOCK_TYPE.empty && BLOCK_TYPE[key] === BLOCK_TYPE.empty_plateform)
-			&& !(prevType === BLOCK_TYPE.empty_plateform && BLOCK_TYPE[key] === BLOCK_TYPE.empty)
+			(key) =>
+				BLOCK_TYPE[key] !== prevType &&
+				!(
+					prevType === BLOCK_TYPE.empty &&
+					BLOCK_TYPE[key] === BLOCK_TYPE.empty_plateform
+				) &&
+				!(
+					prevType === BLOCK_TYPE.empty_plateform &&
+					BLOCK_TYPE[key] === BLOCK_TYPE.empty
+				)
 		)
 		const probability = 1 / possibleTypes.length
 

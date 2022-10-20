@@ -83,7 +83,11 @@ export default class Player {
 		this.initAnimations()
 
 		this.container.add(this.player)
-		this.container.scale.set(CONTAINER_SCALE, CONTAINER_SCALE, CONTAINER_SCALE)
+		this.container.scale.set(
+			CONTAINER_SCALE,
+			CONTAINER_SCALE,
+			CONTAINER_SCALE
+		)
 	}
 
 	initAnimations() {
@@ -193,7 +197,7 @@ export default class Player {
 			this.fusionBody.applyImpulse({ x: 0.0, y: 1.25, z: 0.0 }, true)
 			return
 		}
-		this.playerBody.applyImpulse({ x: 0.0, y: 0.5, z: 0.0 }, true)
+		this.playerBody.applyImpulse({ x: 0.0, y: 0.6, z: 0.0 }, true)
 	}
 
 	handleFusion() {
@@ -201,32 +205,32 @@ export default class Player {
 
 		gsap.timeline()
 			.to(this, {
-			scale: 0,
-			duration: 0.25,
-			ease: 'power1.easeIn',
-			onUpdate: () => {
-				this.container.scale.set(this.scale, this.scale, this.scale)
-			},
-			onComplete:() => {
-				this.fusionEvent.trigger('fusion')
-				this.isFusion = true
+				scale: 0,
+				duration: 0.25,
+				ease: 'power1.easeIn',
+				onUpdate: () => {
+					this.container.scale.set(this.scale, this.scale, this.scale)
+				},
+				onComplete: () => {
+					this.fusionEvent.trigger('fusion')
+					this.isFusion = true
 
-				this.playerBody.setTranslation({
-					x: 0,
-					y: 0,
-					z: -10
-				})
-				this.playerBody.sleep()
-			}
-		})
-		.to(this, {
-			scale: CONTAINER_SCALE,
-			duration: 0.25,
-			ease: 'power1.easeOut',
-			onUpdate: () => {
-				this.container.scale.set(this.scale, this.scale, this.scale)
-			},
-		})
+					this.playerBody.setTranslation({
+						x: 0,
+						y: 0,
+						z: -10,
+					})
+					this.playerBody.sleep()
+				},
+			})
+			.to(this, {
+				scale: CONTAINER_SCALE,
+				duration: 0.25,
+				ease: 'power1.easeOut',
+				onUpdate: () => {
+					this.container.scale.set(this.scale, this.scale, this.scale)
+				},
+			})
 	}
 
 	handleDefusion() {
@@ -234,33 +238,33 @@ export default class Player {
 
 		gsap.timeline()
 			.to(this, {
-			scale: 0,
-			duration: 0.25,
-			ease: 'power1.easeIn',
-			onUpdate: () => {
-				this.container.scale.set(this.scale, this.scale, this.scale)
-			},
-			onComplete:() => {
-				this.fusionEvent.trigger('defusion')
-				this.isFusion = false
+				scale: 0,
+				duration: 0.25,
+				ease: 'power1.easeIn',
+				onUpdate: () => {
+					this.container.scale.set(this.scale, this.scale, this.scale)
+				},
+				onComplete: () => {
+					this.fusionEvent.trigger('defusion')
+					this.isFusion = false
 
-				const offset = this.id === 1 ? SPHERE_RAY : -SPHERE_RAY
-				this.playerBody.setTranslation({
-					x: this.container.position.x + offset,
-					y: BLOCK_HEIGHT * 0.5 + SPHERE_RAY,
-					z: 0
-				})
-				this.playerBody.wakeUp()
-			}
-		})
-		.to(this, {
-			scale: CONTAINER_SCALE,
-			duration: 0.25,
-			ease: 'power1.easeOut',
-			onUpdate: () => {
-				this.container.scale.set(this.scale, this.scale, this.scale)
-			},
-		})
+					const offset = this.id === 1 ? SPHERE_RAY : -SPHERE_RAY
+					this.playerBody.setTranslation({
+						x: this.container.position.x + offset,
+						y: BLOCK_HEIGHT * 0.5 + SPHERE_RAY,
+						z: 0,
+					})
+					this.playerBody.wakeUp()
+				},
+			})
+			.to(this, {
+				scale: CONTAINER_SCALE,
+				duration: 0.25,
+				ease: 'power1.easeOut',
+				onUpdate: () => {
+					this.container.scale.set(this.scale, this.scale, this.scale)
+				},
+			})
 	}
 
 	handleRestart() {
@@ -276,9 +280,7 @@ export default class Player {
 	// RENDER
 
 	render() {
-		const currentBody = this.isFusion
-			? this.fusionBody
-			: this.playerBody
+		const currentBody = this.isFusion ? this.fusionBody : this.playerBody
 
 		if (!this.isFusion || this.id === 1) {
 			currentBody.setLinvel(
@@ -293,10 +295,10 @@ export default class Player {
 
 		const t = currentBody.translation()
 		const offset = this.isFusion
-			 ? this.id === 1
-			 	? - SPHERE_RAY
+			? this.id === 1
+				? -SPHERE_RAY
 				: SPHERE_RAY
-			 : 0
+			: 0
 		this.container.position.set(t.x, t.y + offset, t.z)
 
 		this.mixer.update(this.time.delta)

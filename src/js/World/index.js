@@ -21,6 +21,7 @@ import { World as PhysicsWorld, EventQueue } from '@dimforge/rapier3d-compat'
 export const COLORS = {
 	1: 0x29a4e6,
 	2: 0xe6603c,
+	3: 0xac78ff,
 }
 
 export default class World {
@@ -181,9 +182,16 @@ export default class World {
 		if (!this.timerDiv) return
 
 		const time = new Date(this.time.current - store.startTime)
-		this.timerDiv.innerHTML = store.startTime === null
-			? '0'
-			: `${time.getMinutes().toString().padStart(2, '0')}:${time.getSeconds().toString().padStart(2, '0')}:${time.getMilliseconds().toString().padStart(3, '0')}`
+		this.timerDiv.innerHTML =
+			store.startTime === null
+				? '0'
+				: `${time.getMinutes().toString().padStart(2, '0')}:${time
+						.getSeconds()
+						.toString()
+						.padStart(2, '0')}:${time
+						.getMilliseconds()
+						.toString()
+						.padStart(3, '0')}`
 	}
 
 	render() {

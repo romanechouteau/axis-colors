@@ -1,7 +1,7 @@
-import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass';
-import { ShaderPass } from 'three/examples/jsm/postprocessing/ShaderPass.js';
-import { EffectComposer } from './PostProcess/EffectComposer';
-import { GammaCorrectionShader } from 'three/examples/jsm/shaders/GammaCorrectionShader.js';
+import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass'
+import { ShaderPass } from 'three/examples/jsm/postprocessing/ShaderPass.js'
+import { EffectComposer } from './PostProcess/EffectComposer'
+import { GammaCorrectionShader } from 'three/examples/jsm/shaders/GammaCorrectionShader.js'
 import { Scene, sRGBEncoding, WebGLRenderer, ShaderMaterial } from 'three'
 
 import Camera from './Camera'
@@ -76,21 +76,22 @@ export default class App {
 		const gammaCorrection = new ShaderPass(GammaCorrectionShader)
 
 		this.dangerPass = new ShaderPass(
-      new ShaderMaterial({
-        uniforms: {
-          baseTexture: {
-            value: null
-          },
+			new ShaderMaterial({
+				uniforms: {
+					baseTexture: {
+						value: null,
+					},
 					uProgress: {
-						value: 0
-					}
-        },
-        vertexShader: dangerVertShader,
-        fragmentShader: dangerFragShader,
-        defines: {}
-      }), "baseTexture"
-    )
-    this.dangerPass.needsSwap = true
+						value: 0,
+					},
+				},
+				vertexShader: dangerVertShader,
+				fragmentShader: dangerFragShader,
+				defines: {},
+			}),
+			'baseTexture'
+		)
+		this.dangerPass.needsSwap = true
 
 		this.composer.addPass(renderScene)
 		this.composer.addPass(gammaCorrection)
@@ -119,7 +120,7 @@ export default class App {
 			debug: this.debug,
 			assets: this.assets,
 			camera: this.camera,
-			dangerPass: this.dangerPass
+			dangerPass: this.dangerPass,
 		})
 		// Add world to scene
 		this.scene.add(this.world.container)

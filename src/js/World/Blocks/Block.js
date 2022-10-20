@@ -7,6 +7,7 @@ import {
 } from 'three'
 import { ColliderDesc, RigidBodyDesc } from '@dimforge/rapier3d-compat'
 import Tunnel from './Tunnel'
+import Plateform from './Plateform'
 
 export const BLOCK_TYPE = {
 	normal: 0,
@@ -122,6 +123,27 @@ export default class Block {
 
 	initPlatform() {
 		this.createFloor()
+
+		const isDouble = false
+		const isCenter = Math.random() > 0.5
+		const number = isDouble ? 2 : 1
+
+		for (let i = 1; i <= number; i++) {
+			const plateform = new Plateform({
+				id: isDouble ? i : Math.random() > 0.5 ? 1 : 2,
+				time: this.time,
+				block: this,
+				assets: this.assets,
+				isDouble,
+				isCenter: isDouble ? false : isCenter,
+				physicsWorld: this.physicsWorld,
+			})
+
+			this.container.add(plateform.container)
+			this.geometries.push(...plateform.geometries)
+			this.materials.push(...plateform.materials)
+			this.colliders.push(...plateform.colliders)
+		}
 	}
 
 	initEmpty() {
