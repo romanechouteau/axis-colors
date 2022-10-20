@@ -1,8 +1,8 @@
 import './scss/main.scss'
 // Tools
-import Sizes from './js/tools/Sizes'
-import Time from './js/tools/Time'
-import Assets from './js/tools/Loader'
+import Sizes from './js/Tools/Sizes.js'
+import Time from './js/Tools/Time.js'
+import Assets from './js/Tools/Loader.js'
 // App
 import App from './js/App'
 
