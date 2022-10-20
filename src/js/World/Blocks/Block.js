@@ -1,4 +1,4 @@
-import { BoxGeometry, Mesh, MeshNormalMaterial, Object3D } from 'three'
+import { BoxGeometry, Mesh, MeshBasicMaterial, MeshNormalMaterial, Object3D } from 'three'
 import { ColliderDesc, RigidBodyDesc } from '@dimforge/rapier3d-compat'
 import Tunnel from './Tunnel'
 
@@ -17,9 +17,9 @@ export const BLOCK_TYPE_LIST = Object.keys(BLOCK_TYPE)
 // TYPE DIMENSIONS
 export const BLOCK_DIMENSIONS = {
 	[BLOCK_TYPE.normal]: 1,
-	[BLOCK_TYPE.tunnel]: 10,
+	[BLOCK_TYPE.tunnel]: 12,
 	[BLOCK_TYPE.platform]: 3,
-	[BLOCK_TYPE.empty]: 1,
+	[BLOCK_TYPE.empty]: 2,
 	[BLOCK_TYPE.empty_plateform]: 6,
 	[BLOCK_TYPE.button]: 3,
 	[BLOCK_TYPE.enemy]: 3,
@@ -42,15 +42,16 @@ export default class Block {
 
 		this.geometries = []
 		this.materials = []
-		this.rigidBodies = []
+		this.colliders = []
 
 		this.container = new Object3D()
 		this.init()
 	}
 
 	init() {
+		this.width = BLOCK_WIDTH * BLOCK_DIMENSIONS[this.type]
 		this.container.position.set(
-			this.position.x,
+			this.position.x + this.width * 0.5,
 			this.position.y,
 			this.position.z
 		)
@@ -95,10 +96,11 @@ export default class Block {
 		for (let i = 1; i <= 2; i++) {
 			const tunnel = new Tunnel({
 				id: i,
+				time: this.time,
 				block: this,
 				assets: this.assets,
-				listener: this.listener,
 				isLeft: i === 1 ? isLeft : !isLeft,
+				listener: this.listener,
 				physicsWorld: this.physicsWorld,
 			})
 
@@ -106,6 +108,7 @@ export default class Block {
 			this.container.add(tunnel.container)
 			this.geometries.push(...tunnel.geometries)
 			this.materials.push(...tunnel.materials)
+			this.colliders.push(...tunnel.colliders)
 		}
 	}
 
@@ -118,6 +121,7 @@ export default class Block {
 	}
 
 	initEmptyPlatform() {
+		this.createFloor(true)
 		return
 	}
 
@@ -131,11 +135,9 @@ export default class Block {
 
 	// OBJECT CREATION
 
-	createFloor() {
-		const width = BLOCK_WIDTH * BLOCK_DIMENSIONS[this.type]
-
-		const geometry = new BoxGeometry(width, BLOCK_HEIGHT, BLOCK_DEPTH)
-		const material = new MeshNormalMaterial({})
+	createFloor(specialMat) {
+		const geometry = new BoxGeometry(this.width, BLOCK_HEIGHT, BLOCK_DEPTH)
+		const material = specialMat ? new MeshBasicMaterial({ color: 0xFF0000 }) : new MeshNormalMaterial({})
 		const cube = new Mesh(geometry, material)
 		this.container.add(cube)
 
@@ -147,7 +149,7 @@ export default class Block {
 		this.floorBody = this.physicsWorld.createRigidBody(rigidBody)
 
 		const collider = ColliderDesc.cuboid(
-			width * 0.5,
+			this.width * 0.5,
 			BLOCK_HEIGHT * 0.5,
 			BLOCK_DEPTH * 0.5
 		)
@@ -156,7 +158,7 @@ export default class Block {
 
 		this.geometries.push(geometry)
 		this.materials.push(material)
-		this.rigidBodies.push(rigidBody)
+		this.colliders.push(collider)
 	}
 
 	// DESTROY
@@ -172,22 +174,12 @@ export default class Block {
 		})
 		this.materials = []
 
-		// this.rigidBodies.forEach((rigidBody) => {
-		// 	this.physicsWorld.removeRigidBody(rigidBody)
-		// })
-		// this.rigidBodies = []
+		this.colliders.forEach((collider) => {
+			this.physicsWorld.removeCollider(collider)
+		})
+		this.colliders = []
 
 		this.container.clear()
 		this.container.removeFromParent()
-	}
-
-	// COLLISION EVENTS
-
-	collisionEvents(handle1, handle2, started) {
-		if (this.type === BLOCK_TYPE.tunnel) {
-			this.tunnels.forEach((tunnel) =>
-				tunnel.collisionEvents(handle1, handle2, started)
-			)
-		}
 	}
 }

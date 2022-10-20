@@ -37,7 +37,6 @@ export default class BlockManager {
 	}
 
 	generateType(first) {
-		// return BLOCK_TYPE.tunnel
 		if (first) return BLOCK_TYPE.normal
 
 		const val = Math.random()
@@ -47,7 +46,9 @@ export default class BlockManager {
 				: this.blocks[this.blocks.length - 1].type
 
 		const possibleTypes = BLOCK_TYPE_LIST.filter(
-			(key) => BLOCK_TYPE[key] !== prevType
+			(key) => (BLOCK_TYPE[key] !== prevType)
+			&& !(prevType === BLOCK_TYPE.empty && BLOCK_TYPE[key] === BLOCK_TYPE.empty_plateform)
+			&& !(prevType === BLOCK_TYPE.empty_plateform && BLOCK_TYPE[key] === BLOCK_TYPE.empty)
 		)
 		const probability = 1 / possibleTypes.length
 
@@ -82,11 +83,11 @@ export default class BlockManager {
 	}
 
 	destroyBlocks() {
-		let x = this.blocks[0].container.position.x
+		let x = this.blocks[0].position.x + this.blocks[0].width
 		while (this.worldPosition.x + x < -this.totalWidth) {
 			const toRemove = this.blocks.shift()
 			toRemove.destroy()
-			x = this.blocks[0].container.position.x
+			x = this.blocks[0].position.x + this.blocks[0].width
 		}
 	}
 
@@ -95,11 +96,5 @@ export default class BlockManager {
 
 		this.generateBlocks()
 		this.destroyBlocks()
-	}
-
-	collisionEvents(handle1, handle2, started) {
-		this.blocks.forEach((block) =>
-			block.collisionEvents(handle1, handle2, started)
-		)
 	}
 }
