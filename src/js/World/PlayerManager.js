@@ -74,6 +74,7 @@ export default class PlayerManager {
 	}
 
 	toggleFusion() {
+		if (!store.started) return
 		if (store.isFusion) {
 			store.isFusion = false
 			this.s_defusion.play()
