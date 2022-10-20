@@ -100,12 +100,15 @@ export default class Tunnel {
 	}
 
 	handlePlayerInside(player) {
-		const inside = player.container.position.x - SPHERE_RAY >= this.tunnelLeft
-			&& player.container.position.x + SPHERE_RAY <= this.tunnelRight
-			&& player.container.position.z - SPHERE_RAY >= this.tunnelFar
-			&& player.container.position.z + SPHERE_RAY <= this.tunnelNear
-
 		const index = this.playersInside.indexOf(player.id)
+
+		const insideX = player.container.position.x - SPHERE_RAY >= this.tunnelLeft
+			&& player.container.position.x + SPHERE_RAY <= this.tunnelRight
+		const inside = index !== -1
+			? insideX
+			: insideX
+				&& player.container.position.z - SPHERE_RAY >= this.tunnelFar
+				&& player.container.position.z + SPHERE_RAY <= this.tunnelNear
 
 		if (inside === false) {
 			if (index === -1) return
