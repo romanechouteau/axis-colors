@@ -18,8 +18,8 @@ import {
 	ActiveCollisionTypes,
 } from '@dimforge/rapier3d-compat'
 
+import LivesManager from './LivesManager'
 import { BLOCK_DEPTH, BLOCK_HEIGHT } from './Blocks/Block'
-import { COLORS } from '.'
 
 export const SPHERE_RAY = 0.3
 
@@ -72,7 +72,7 @@ export default class Player {
 		body.material = new MeshStandardMaterial({
 			roughness: 0,
 			metalness: 0,
-			map: this.assets.textures[this.id === 1 ? 'blue' : 'pink'],
+			map: this.assets.textures[this.id === 1 ? 'pink' : 'blue'],
 		})
 
 		this.initAnimations()
@@ -180,6 +180,12 @@ export default class Player {
 		this.s_fusion.play()
 	}
 
+	checkFall() {
+		if (this.container.position.y < - BLOCK_HEIGHT * 0.5 && LivesManager.lives > 0) {
+			LivesManager.loose()
+		}
+	}
+
 	// RENDER
 
 	render(delta) {
@@ -196,5 +202,7 @@ export default class Player {
 		this.container.position.set(t.x, t.y, t.z)
 
 		this.mixer.update(delta)
+
+		this.checkFall()
 	}
 }
