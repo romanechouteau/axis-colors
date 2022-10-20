@@ -141,6 +141,6 @@ export default class PlayerManager {
 			this.gamepadEmulator.update()
 		}
 
-		this.players.forEach((player) => player.render(this.time.delta))
+		this.players.forEach((player) => player.render())
 	}
 }

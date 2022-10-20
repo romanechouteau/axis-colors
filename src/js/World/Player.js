@@ -141,7 +141,7 @@ export default class Player {
 			return
 
 		if (!this.a_walk.isRunning()) {
-			this.a_walk.setDuration(this.speed * 180).play()
+			this.a_walk.setDuration(1620 / this.speed).play()
 		} else if (position.x === 0 && position.y === 0) {
 			this.a_walk.stop()
 		}
@@ -184,7 +184,7 @@ export default class Player {
 
 	// RENDER
 
-	render(delta) {
+	render() {
 		this.playerBody.setLinvel(
 			{
 				x: this.velocity.x,
@@ -197,7 +197,10 @@ export default class Player {
 		const t = this.playerBody.translation()
 		this.container.position.set(t.x, t.y, t.z)
 
-		this.mixer.update(delta)
+		this.mixer.update(this.time.delta)
+
+		const elapsed = store.startTime === null ? 0 : this.time.current - store.startTime
+		this.speed = 3 + elapsed * 0.0002
 
 		this.checkFall()
 	}
