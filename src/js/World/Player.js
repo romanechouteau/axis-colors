@@ -1,14 +1,10 @@
 import Axis from 'axis-api'
 import {
-	Mesh,
-	MeshBasicMaterial,
 	Object3D,
-	SphereGeometry,
 	Vector2,
 	Audio,
 	AnimationClip,
 	AnimationMixer,
-	MeshNormalMaterial,
 	MeshStandardMaterial,
 } from 'three'
 import {
@@ -18,8 +14,10 @@ import {
 	ActiveCollisionTypes,
 } from '@dimforge/rapier3d-compat'
 
+import Emitter from '../Tools/EventEmitter'
 import LivesManager from './LivesManager'
 import { BLOCK_DEPTH, BLOCK_HEIGHT } from './Blocks/Block'
+import { store } from '../Tools/Store'
 
 export const SPHERE_RAY = 0.3
 
@@ -34,7 +32,8 @@ export default class Player {
 		this.container = new Object3D()
 		this.velocity = new Vector2()
 		this.speed = 3
-		this.isFusioned = false
+
+		this.keyEvent = new Emitter()
 
 		this.init()
 	}
@@ -126,14 +125,6 @@ export default class Player {
 		this.s_jump = new Audio(this.listener)
 		this.s_jump.setBuffer(this.assets.sounds.jump)
 		this.s_jump.setVolume(0.2)
-
-		this.s_fusion = new Audio(this.listener)
-		this.s_fusion.setBuffer(this.assets.sounds.fusion)
-		this.s_fusion.setVolume(0.4)
-
-		this.s_defusion = new Audio(this.listener)
-		this.s_defusion.setBuffer(this.assets.sounds.defusion)
-		this.s_defusion.setVolume(0.4)
 	}
 
 	// EVENT HANDLERS
@@ -160,10 +151,15 @@ export default class Player {
 	}
 
 	handleKeyDown = (e) => {
-		if (e.key === 'a') {
-			this.handleJump()
-		} else if (e.key === 'w') {
-			this.handleFusion()
+		switch (e.key) {
+			case 'a':
+				if (store.hasLost) this.handleRestart()
+				else if (store.isFusion) this.keyEvent.trigger('keydown', [e.key])
+				else if (store.started) this.handleJump()
+				break
+			case 'w':
+				this.keyEvent.trigger('keydown', [e.key])
+				break;
 		}
 	}
 
@@ -173,15 +169,15 @@ export default class Player {
 	}
 
 	handleFusion() {
-		if (this.isFusioned) {
-			this.s_defusion.play()
-			return
-		}
-		this.s_fusion.play()
+		console.log('fusion')
+	}
+
+	handleRestart() {
+		location.reload()
 	}
 
 	checkFall() {
-		if (this.container.position.y < - BLOCK_HEIGHT * 0.5 && LivesManager.lives > 0) {
+		if (this.container.position.y < - BLOCK_HEIGHT * 0.5 && !store.hasLost) {
 			LivesManager.loose()
 		}
 	}

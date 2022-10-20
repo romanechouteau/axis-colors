@@ -1,4 +1,5 @@
 import Emitter from '../Tools/EventEmitter'
+import { store } from '../Tools/Store'
 
 class LivesManager {
 	constructor() {
@@ -24,7 +25,8 @@ class LivesManager {
   }
 
   endGame() {
-    console.log('tas perdu #endgame #avengers')
+    store.hasLost = true
+    document.getElementById('end').style.display = 'block'
   }
 }
 

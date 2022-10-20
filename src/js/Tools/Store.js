@@ -17,6 +17,10 @@ const store = {
 	browser: null,
 
 	views: null,
+
+	started: false,
+	hasLost: false,
+	isFusion: false
 }
 
 export { store }

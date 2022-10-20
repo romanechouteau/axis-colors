@@ -1,5 +1,7 @@
 import Axis from 'axis-api'
-import { Object3D } from 'three'
+import { Object3D, Audio } from 'three'
+
+import { store } from '../Tools/Store'
 
 import Player from './Player'
 
@@ -12,6 +14,7 @@ export default class PlayerManager {
 
 		this.container = new Object3D()
 		this.players = []
+		this.actions = []
 
 		this.init()
 	}
@@ -29,7 +32,11 @@ export default class PlayerManager {
 			})
 			this.players.push(player)
 			this.container.add(player.container)
+
+			player.keyEvent.on('keydown', (key) => this.checkSynchro(player.id, key))
 		}
+
+		this.initSounds()
 
 		this.time.on('tick', () => {
 			this.render()
@@ -46,6 +53,84 @@ export default class PlayerManager {
 		Axis.registerGamepadEmulatorKeys(this.gamepadEmulator, 5, 'a', 2)
 		Axis.registerGamepadEmulatorKeys(this.gamepadEmulator, 6, 'w', 1)
 		Axis.registerGamepadEmulatorKeys(this.gamepadEmulator, 7, 'w', 2)
+	}
+
+	initSounds() {
+		this.s_fusion = new Audio(this.listener)
+		this.s_fusion.setBuffer(this.assets.sounds.fusion)
+		this.s_fusion.setVolume(0.4)
+
+		this.s_defusion = new Audio(this.listener)
+		this.s_defusion.setBuffer(this.assets.sounds.defusion)
+		this.s_defusion.setVolume(0.4)
+	}
+
+	// HANDLERS
+
+	handleStart() {
+		store.started = true
+		document.getElementById('start').style.display = 'none'
+	}
+
+	toggleFusion() {
+		if (store.isFusion) {
+			store.isFusion = false
+			this.s_defusion.play()
+			return
+		}
+		store.isFusion = true
+		this.s_fusion.play()
+
+		for (let i = 0; i < 2; i++) {
+			this.players[i].handleFusion()
+		}
+	}
+
+	handleJump() {
+		for (let i = 0; i < 2; i++) {
+			this.players[i].handleJump()
+		}
+	}
+
+	checkSynchro(id, key) {
+		if (this.actions.length > 0) {
+			const action = this.actions[0]
+
+			if (action.id === id) {
+				this.handleFirstAction(id, key)
+			} else if (action.key !== key) {
+				this.toggleFusion()
+			} else {
+				this.handleSyncedAction(key)
+			}
+		} else {
+			this.handleFirstAction(id, key)
+		}
+	}
+
+	handleFirstAction(id, key) {
+		if (this.timeout) clearTimeout(this.timeout)
+		this.actions = [{ id, key }]
+		this.timeout = setTimeout(this.handleEndSynchro.bind(this), 1000)
+	}
+
+	handleSyncedAction(key) {
+		if (this.timeout) clearTimeout(this.timeout)
+		this.actions = []
+
+		switch (key) {
+			case 'a':
+				this.handleJump()
+				break
+			case 'w':
+				if (store.started) this.toggleFusion()
+				else this.handleStart()
+				break;
+		}
+	}
+
+	handleEndSynchro() {
+		this.toggleFusion()
 	}
 
 	// RENDER

@@ -27,6 +27,7 @@ export default class App {
 		this.initDebug()
 		this.initEvents()
 		this.setWorld()
+		this.setScreens()
 	}
 
 	initEvents() {
@@ -91,6 +92,11 @@ export default class App {
 		})
 		// Add world to scene
 		this.scene.add(this.world.container)
+	}
+
+	setScreens() {
+		document.getElementById('start').style.display = 'block'
+		document.getElementById('end').style.display = 'none'
 	}
 }
 
