@@ -1,8 +1,5 @@
 import { Object3D, Audio, MeshStandardMaterial } from 'three'
-import {
-	ColliderDesc,
-	RigidBodyDesc,
-} from '@dimforge/rapier3d-compat'
+import { ColliderDesc, RigidBodyDesc } from '@dimforge/rapier3d-compat'
 
 import LivesManager from '../LivesManager'
 import { COLORS } from '../index'
@@ -16,6 +13,7 @@ export default class Tunnel {
 		this.block = options.block
 		this.assets = options.assets
 		this.isLeft = options.isLeft
+		this.isLoop = options.isLoop
 		this.listener = options.listener
 		this.physicsWorld = options.physicsWorld
 
@@ -31,13 +29,19 @@ export default class Tunnel {
 	}
 
 	init() {
-		const { geometry, x, y, z } = this.initModel()
-		this.initPhysics(geometry, x, y, z)
+		let values
+		if (!this.isLoop) {
+			values = this.initSimpleModel()
+		} else {
+			values = this.initLoopModel()
+		}
+
+		this.initPhysics(values.geometry, values.x, values.y, values.z)
 
 		this.time.on('tick', this.render)
 	}
 
-	initModel() {
+	initSimpleModel() {
 		// MODEL
 
 		const tunnel = this.assets.models.tunnel.scene.children[0].clone()
@@ -47,7 +51,7 @@ export default class Tunnel {
 			color: COLORS[this.id],
 			transparent: true,
 			opacity: 0.5,
-			roughness: 0.,
+			roughness: 0,
 		})
 		tunnel.material = material
 
@@ -61,8 +65,6 @@ export default class Tunnel {
 		this.container.position.y = BLOCK_HEIGHT * 0.5 + radius
 		this.container.position.z = this.isLeft ? -radius : radius
 
-		this.container.scale.set(1, 0.8, 0.8)
-
 		const x = this.block.container.position.x + this.container.position.x
 		const y = this.block.container.position.y + this.container.position.y
 		const z = this.block.container.position.z + this.container.position.z
@@ -75,12 +77,51 @@ export default class Tunnel {
 		return { geometry, x, y, z }
 	}
 
+	initLoopModel() {
+		// MODEL
+
+		let tunnel
+		if (!this.isLeft) {
+			tunnel = this.assets.models.looptunnel1.scene.children[0].clone()
+		} else {
+			tunnel = this.assets.models.looptunnel2.scene.children[0].clone()
+		}
+		const radius = BLOCK_DEPTH * 0.27
+		const geometry = tunnel.geometry
+		const material = new MeshStandardMaterial({
+			color: COLORS[this.id],
+			transparent: true,
+			opacity: 0.5,
+			roughness: 0,
+		})
+		tunnel.material = material
+
+		this.geometries.push(geometry)
+		this.materials.push(material)
+
+		this.container.add(tunnel)
+
+		// POSITION
+
+		this.container.position.y = BLOCK_HEIGHT * 0.5 + radius
+
+		const x = this.block.container.position.x + this.container.position.x
+		const y = this.block.container.position.y + this.container.position.y
+		const z = this.block.container.position.z + this.container.position.z
+		const _z =
+			this.block.container.position.z + (this.isLeft ? -radius : radius)
+
+		this.tunnelLeft = x - this.block.width * 0.27
+		this.tunnelRight = x + this.block.width * 0.27
+
+		this.tunnelFar = _z - radius
+		this.tunnelNear = _z + radius
+
+		return { geometry, x, y, z }
+	}
+
 	initPhysics(geometry, x, y, z) {
-		const rigidBody = RigidBodyDesc.fixed().setTranslation(
-			x,
-			y,
-			z
-		)
+		const rigidBody = RigidBodyDesc.fixed().setTranslation(x, y, z)
 		this.tunnelBody = this.physicsWorld.createRigidBody(rigidBody)
 
 		const collider = ColliderDesc.trimesh(
@@ -102,13 +143,16 @@ export default class Tunnel {
 	handlePlayerInside(player) {
 		const index = this.playersInside.indexOf(player.id)
 
-		const insideX = player.container.position.x - SPHERE_RAY >= this.tunnelLeft
-			&& player.container.position.x + SPHERE_RAY <= this.tunnelRight
-		const inside = index !== -1
-			? insideX
-			: insideX
-				&& player.container.position.z - SPHERE_RAY >= this.tunnelFar
-				&& player.container.position.z + SPHERE_RAY <= this.tunnelNear
+		const insideX =
+			player.container.position.x + SPHERE_RAY >= this.tunnelLeft &&
+			player.container.position.x - SPHERE_RAY <= this.tunnelRight
+
+		const inside =
+			index !== -1
+				? insideX
+				: insideX &&
+				  player.container.position.z - SPHERE_RAY >= this.tunnelFar &&
+				  player.container.position.z + SPHERE_RAY <= this.tunnelNear
 
 		if (inside === false) {
 			if (index === -1) return
@@ -130,7 +174,7 @@ export default class Tunnel {
 	}
 
 	render = () => {
-		this.block.playerManager.players.forEach(player => {
+		this.block.playerManager.players.forEach((player) => {
 			this.handlePlayerInside(player)
 		})
 	}

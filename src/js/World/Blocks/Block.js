@@ -1,4 +1,10 @@
-import { BoxGeometry, Mesh, MeshBasicMaterial, MeshNormalMaterial, Object3D } from 'three'
+import {
+	BoxGeometry,
+	Mesh,
+	MeshBasicMaterial,
+	MeshNormalMaterial,
+	Object3D,
+} from 'three'
 import { ColliderDesc, RigidBodyDesc } from '@dimforge/rapier3d-compat'
 import Tunnel from './Tunnel'
 
@@ -91,6 +97,7 @@ export default class Block {
 		this.createFloor()
 
 		const isLeft = Math.random() > 0.5
+		const isLoop = Math.random() > 0.5
 		this.tunnels = []
 
 		for (let i = 1; i <= 2; i++) {
@@ -100,6 +107,7 @@ export default class Block {
 				block: this,
 				assets: this.assets,
 				isLeft: i === 1 ? isLeft : !isLeft,
+				isLoop,
 				listener: this.listener,
 				physicsWorld: this.physicsWorld,
 			})
@@ -137,7 +145,9 @@ export default class Block {
 
 	createFloor(specialMat) {
 		const geometry = new BoxGeometry(this.width, BLOCK_HEIGHT, BLOCK_DEPTH)
-		const material = specialMat ? new MeshBasicMaterial({ color: 0xFF0000 }) : new MeshNormalMaterial({})
+		const material = specialMat
+			? new MeshBasicMaterial({ color: 0xff0000 })
+			: new MeshNormalMaterial({})
 		const cube = new Mesh(geometry, material)
 		this.container.add(cube)
 
