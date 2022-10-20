@@ -1,10 +1,7 @@
-import { Object3D, MeshLambertMaterial, Audio } from 'three'
+import { Object3D, Audio, MeshStandardMaterial } from 'three'
 import {
 	ColliderDesc,
 	RigidBodyDesc,
-	ActiveEvents,
-	ActiveCollisionTypes,
-	ActiveHooks,
 } from '@dimforge/rapier3d-compat'
 
 import { COLORS } from '..'
@@ -21,6 +18,7 @@ export default class Tunnel {
 
 		this.geometries = []
 		this.materials = []
+		this.colliders = []
 
 		this.container = new Object3D()
 
@@ -31,8 +29,11 @@ export default class Tunnel {
 		const tunnel = this.assets.models.tunnel.scene.children[0].clone()
 		const radius = BLOCK_DEPTH * 0.27
 		const geometry = tunnel.geometry
-		const material = new MeshLambertMaterial({
+		const material = new MeshStandardMaterial({
 			color: COLORS[this.id],
+			transparent: true,
+			opacity: 0.5,
+			roughness: 0.,
 		})
 		tunnel.material = material
 
@@ -50,15 +51,16 @@ export default class Tunnel {
 		)
 		this.tunnelBody = this.physicsWorld.createRigidBody(rigidBody)
 
-		this.collider = ColliderDesc.trimesh(
+		const collider = ColliderDesc.trimesh(
 			geometry.attributes.position.array,
 			geometry.index.array
 		)
 
-		this.physicsWorld.createCollider(this.collider, this.tunnelBody)
+		this.physicsWorld.createCollider(collider, this.tunnelBody)
 
 		this.geometries.push(geometry)
 		this.materials.push(material)
+		this.colliders.push(collider)
 	}
 
 	initSounds() {
@@ -78,8 +80,8 @@ export default class Tunnel {
 					player.playerBody.handle === handle2
 				) {
 					if (player.id !== this.id) {
-						this.s_error.play()
 						console.log('pas bien lol')
+						this.s_error.play()
 					}
 				}
 			})
