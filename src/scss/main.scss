@@ -64,6 +64,17 @@
 		width: 100vw;
 	}
 }
+
+#timer {
+	position: absolute;
+	top: 80px;
+	left: 50vw;
+	transform: translateX(-50%);
+	color: white;
+	font-size: 3em;
+	filter: drop-shadow(4px 0 2px #823ade);
+}
+
 #leaderboard {
 	position: absolute;
 	width: 40vw;
