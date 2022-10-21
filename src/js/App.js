@@ -129,6 +129,7 @@ export default class App {
 	setScreens() {
 		document.getElementById('start').style.display = 'block'
 		document.getElementById('end').style.display = 'none'
+		document.getElementById('lives').style.display = 'flex'
 	}
 }
 

@@ -64,6 +64,17 @@
 		width: 100vw;
 	}
 }
+
+#timer {
+	position: absolute;
+	top: 80px;
+	left: 50vw;
+	transform: translateX(-50%);
+	color: white;
+	font-size: 3em;
+	filter: drop-shadow(4px 0 2px #823ade);
+}
+
 #leaderboard {
 	position: absolute;
 	width: 40vw;
@@ -89,4 +100,32 @@
 	top: 0;
 	left: 0;
 	color: black;
+}
+
+#lives {
+	position: absolute;
+	top: 80px;
+	left: 80px;
+	img {
+		width: 100px;
+	}
+	.lives_1,
+	.lives_2,
+	.lives_3 {
+		display: flex;
+		position: relative;
+		margin-right: 10px;
+		.full {
+			position: absolute;
+			top: 0;
+			left: 0;
+			transform: opacity 0.3s ease-out;
+		}
+
+		&.is-hidden {
+			.full {
+				opacity: 0;
+			}
+		}
+	}
 }
