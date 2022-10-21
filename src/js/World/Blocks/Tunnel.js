@@ -17,7 +17,6 @@ export default class Tunnel {
 		this.material = options.material
 		this.listener = options.listener
 		this.physicsWorld = options.physicsWorld
-		this.hdr = options.hdr
 
 		this.geometries = []
 		this.colliders = []
