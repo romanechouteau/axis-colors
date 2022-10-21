@@ -16,7 +16,7 @@ export default class Sizes extends Emitter {
 	resize() {
 		store.resolution.width = window.innerWidth
 		store.resolution.height = window.innerHeight
-		store.resolution.dpr = window.devicePixelRatio
+		store.resolution.dpr = 1
 		store.aspect.ratio = store.resolution.width / store.resolution.height
 
 		this.trigger('resize')

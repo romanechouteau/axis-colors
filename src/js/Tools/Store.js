@@ -2,7 +2,7 @@ const store = {
 	resolution: {
 		width: window.innerWidth,
 		height: window.innerHeight,
-		dpr: window.devicePixelRatio,
+		dpr: 1,
 	},
 
 	aspect: {
