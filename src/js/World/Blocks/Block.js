@@ -46,6 +46,7 @@ export default class Block {
 		this.position = options.position
 		this.physicsWorld = options.physicsWorld
 		this.playerManager = options.playerManager
+		this.hdr = options.hdr
 
 		this.geometries = []
 		this.materials = []
@@ -111,6 +112,7 @@ export default class Block {
 				isLoop,
 				listener: this.listener,
 				physicsWorld: this.physicsWorld,
+				hdr: this.hdr,
 			})
 
 			this.tunnels.push(tunnel)
@@ -137,8 +139,9 @@ export default class Block {
 				assets: this.assets,
 				isLeft: i === 1 ? isLeft : !isLeft,
 				isDouble,
-				isCenter: isDouble ? false :  Math.random() > 0.5,
+				isCenter: isDouble ? false : Math.random() > 0.5,
 				physicsWorld: this.physicsWorld,
+				hdr: this.hdr,
 			})
 
 			this.plateforms.push(plateform)
