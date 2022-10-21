@@ -112,10 +112,13 @@ export default class PlayerManager {
 	handleStart() {
 		store.started = true
 		store.startTime = Date.now()
-		document.getElementById('start').style.display = 'none'
+		document.getElementById('start').classList.add('is-hidden')
 		setTimeout(() => {
 			document.getElementById('colors').classList.add('is-hidden')
 		}, 3000)
+		setTimeout(() => {
+			document.getElementById('start').style.display = 'none'
+		}, 10000)
 	}
 
 	toggleFusion(value) {

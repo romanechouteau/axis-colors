@@ -37,7 +37,7 @@ class LivesManager {
 	endGame() {
 		store.hasLost = true
 		const endScreen = document.getElementById('end')
-		endScreen.style.display = 'block'
+		endScreen.classList.remove('is-hidden')
 
 		const input = document.querySelector('input')
 
