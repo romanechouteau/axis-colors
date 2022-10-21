@@ -1,13 +1,12 @@
 import { ColliderDesc, RigidBodyDesc } from '@dimforge/rapier3d-compat'
 import { MeshStandardMaterial, Object3D } from 'three'
 
-import { BLOCK_DEPTH } from './Block'
-import { SPHERE_RAY } from '../Player'
-
 import LivesManager from '../LivesManager'
 import { store } from '../../Tools/Store'
+import { SPHERE_RAY } from '../Player'
+import { BLOCK_DEPTH } from './Block'
 
-export const TUNNEL_COLORS = {
+export const PLATFORM_COLORS = {
 	pink: 0xffafd2,
 	blue: 0x5deff,
 	purple: 0xac78ff,
@@ -19,6 +18,7 @@ export default class Plateform {
 		this.time = options.time
 		this.block = options.block
 		this.assets = options.assets
+		this.isLeft = options.isLeft
 		this.isDouble = options.isDouble
 		this.isCenter = options.isCenter
 		this.physicsWorld = options.physicsWorld
@@ -30,7 +30,7 @@ export default class Plateform {
 		this.container = new Object3D()
 
 		this.activated = false
-		this.wrong = false
+		this.error = false
 
 		this.init()
 	}
@@ -47,10 +47,9 @@ export default class Plateform {
 
 		const plateform = this.assets.models.plateform.scene.children[0].clone()
 		const geometry = plateform.geometry
-		const singleColor = this.id === 1
 		const material = new MeshStandardMaterial({
-			color: TUNNEL_COLORS[
-				this.isCenter ? 'purple' : singleColor ? 'blue' : 'pink'
+			color: PLATFORM_COLORS[
+				this.isCenter ? 'purple' : this.id === 1 ? 'blue' : 'pink'
 			],
 			emissive: 0x000000,
 			roughness: 0,
@@ -64,12 +63,11 @@ export default class Plateform {
 		this.container.add(plateform)
 		this.container.position.y = 2
 
-		const isRight = this.isDouble ? this.id === 2 : Math.random() > 0.5
 		this.container.position.z = this.isCenter
 			? 0
-			: isRight
-			? BLOCK_DEPTH * 0.25
-			: -BLOCK_DEPTH * 0.25
+			: this.isLeft
+				? -BLOCK_DEPTH * 0.25
+				: BLOCK_DEPTH * 0.25
 
 		const x = this.block.container.position.x + this.container.position.x
 		const y = this.block.container.position.y + this.container.position.y
@@ -97,6 +95,15 @@ export default class Plateform {
 		this.colliders.push(collider)
 	}
 
+	handlePlayerAfter(player) {
+		if (
+			!this.activated && (this.id === player.id || this.isCenter) &&
+			player.container.position.x - SPHERE_RAY >= this.plateformRight
+		) {
+			this.handleError()
+		}
+	}
+
 	handlePlayerOn(player) {
 		const insideX =
 			player.container.position.x + SPHERE_RAY >= this.plateformLeft &&
@@ -108,14 +115,6 @@ export default class Plateform {
 			player.container.position.z - SPHERE_RAY >= this.plateformFar &&
 			player.container.position.z + SPHERE_RAY <= this.plateformNear
 
-		if (
-			!this.activated &&
-			player.container.position.x - SPHERE_RAY >= this.plateformRight &&
-			(this.id === player.id || this.isCenter)
-		) {
-			this.handleWrongPlateform()
-		}
-
 		if (!insideX || !insideZ || !insideY) {
 			return
 		}
@@ -123,26 +122,28 @@ export default class Plateform {
 		if (this.isCenter) {
 			if (store.isFusion) {
 				this.activated = true
-			} else {
-				this.handleWrongPlateform()
+				return
 			}
+			this.handleError()
 			return
 		}
 
-		if (player.id !== this.id) this.handleWrongPlateform()
+		if (player.id !== this.id) this.handleError()
 		else this.activated = true
 	}
 
-	handleWrongPlateform() {
-		if (this.wrong) return
-		this.wrong = true
+	handleError() {
+		if (this.error) return
+		this.error = true
 		LivesManager.removeLife()
 		this.s_error?.play()
 	}
 
 	render = () => {
+		if (this.error) return
 		this.block.playerManager.players.forEach((player) => {
 			this.handlePlayerOn(player)
+			this.handlePlayerAfter(player)
 		})
 	}
 }
