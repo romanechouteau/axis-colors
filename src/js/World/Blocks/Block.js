@@ -1,4 +1,10 @@
-import { BoxGeometry, Mesh, MeshStandardMaterial, Object3D } from 'three'
+import {
+	BoxGeometry,
+	Mesh,
+	MeshMatcapMaterial,
+	MeshStandardMaterial,
+	Object3D,
+} from 'three'
 import { ColliderDesc, RigidBodyDesc } from '@dimforge/rapier3d-compat'
 
 import Button from './Button'
@@ -122,11 +128,8 @@ export default class Block {
 			roughness: 0.3,
 		})
 
-		this.buttonMaterial = new MeshStandardMaterial({
-			color: BUTTON_COLOR,
-			emissive: 0x000000,
-			roughness: 1,
-			metalness: 1,
+		this.buttonMaterial = new MeshMatcapMaterial({
+			matcap: this.assets.textures.gold,
 		})
 
 		this.tunnelMaterials = []

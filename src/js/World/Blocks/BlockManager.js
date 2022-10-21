@@ -50,7 +50,8 @@ export default class BlockManager {
 
 		const possibleTypes = BLOCK_TYPE_LIST.filter(
 			(key) =>
-				(BLOCK_TYPE[key] !== prevType || BLOCK_TYPE[key] === BLOCK_TYPE.normal) &&
+				(BLOCK_TYPE[key] !== prevType ||
+					BLOCK_TYPE[key] === BLOCK_TYPE.normal) &&
 				!(
 					prevType === BLOCK_TYPE.empty &&
 					BLOCK_TYPE[key] === BLOCK_TYPE.empty_plateform
@@ -69,7 +70,10 @@ export default class BlockManager {
 				)
 		)
 
-		const totalProbability = possibleTypes.reduce((acc, type) => acc + BLOCK_PROBABILITY[BLOCK_TYPE[type]], 0)
+		const totalProbability = possibleTypes.reduce(
+			(acc, type) => acc + BLOCK_PROBABILITY[BLOCK_TYPE[type]],
+			0
+		)
 		let currentProbability = 0
 
 		for (let i = 0; i < possibleTypes.length; i++) {
