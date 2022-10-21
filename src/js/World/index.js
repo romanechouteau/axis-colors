@@ -7,7 +7,17 @@ import {
 	Vector3,
 	AudioListener,
 	Audio,
+	CubeTextureLoader,
+	CubeRefractionMapping,
+	sRGBEncoding,
 } from 'three'
+
+import px from '/hdr/p_x.png'
+import nx from '/hdr/n_x.png'
+import py from '/hdr/p_y.png'
+import ny from '/hdr/n_y.png'
+import pz from '/hdr/p_z.png'
+import nz from '/hdr/n_z.png'
 
 import Background from './Background'
 import BlockManager from './Blocks/BlockManager'
@@ -50,6 +60,8 @@ export default class World {
 		await getRapier()
 		this.eventQueue = new EventQueue(true)
 
+		this.initHDR()
+
 		this.setPhysics()
 
 		this.setSize()
@@ -76,6 +88,13 @@ export default class World {
 		this.assets.on('ressourcesReady', () => {
 			this.init()
 		})
+	}
+
+	initHDR() {
+		const cubeTexture = [px, nx, py, ny, pz, nz]
+		this.hdr = new CubeTextureLoader().load(cubeTexture)
+		this.hdr.mapping = CubeRefractionMapping
+		this.hdr.encoding = sRGBEncoding
 	}
 
 	setSize() {
@@ -123,7 +142,8 @@ export default class World {
 			physicsWorld: this.physicsWorld,
 			worldPosition: this.container.position,
 			playerManager: this.playerManager,
-			dangerManager: this.dangerManager
+			dangerManager: this.dangerManager,
+			hdr: this.hdr,
 		})
 		this.container.add(this.blockManager.container)
 	}

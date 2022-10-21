@@ -3,6 +3,7 @@ import {
 	Mesh,
 	MeshBasicMaterial,
 	MeshNormalMaterial,
+	MeshStandardMaterial,
 	Object3D,
 } from 'three'
 import { ColliderDesc, RigidBodyDesc } from '@dimforge/rapier3d-compat'
@@ -60,6 +61,7 @@ export default class Block {
 		this.physicsWorld = options.physicsWorld
 		this.dangerManager = options.dangerManager
 		this.playerManager = options.playerManager
+		this.hdr = options.hdr
 
 		this.geometries = []
 		this.materials = []
@@ -125,6 +127,7 @@ export default class Block {
 				isLoop,
 				listener: this.listener,
 				physicsWorld: this.physicsWorld,
+				hdr: this.hdr,
 			})
 
 			this.tunnels.push(tunnel)
@@ -151,8 +154,9 @@ export default class Block {
 				assets: this.assets,
 				isLeft: i === 1 ? isLeft : !isLeft,
 				isDouble,
-				isCenter: isDouble ? false :  Math.random() > 0.5,
+				isCenter: isDouble ? false : Math.random() > 0.5,
 				physicsWorld: this.physicsWorld,
+				hdr: this.hdr,
 			})
 
 			this.plateforms.push(plateform)
@@ -182,7 +186,7 @@ export default class Block {
 			isLeft: Math.random() > 0.5,
 			isCenter: Math.random() > 0.5,
 			listener: this.listener,
-			dangerManager: this.dangerManager
+			dangerManager: this.dangerManager,
 		})
 
 		this.container.add(this.button.container)
@@ -196,11 +200,17 @@ export default class Block {
 
 	// OBJECT CREATION
 
-	createFloor(specialMat) {
+	createFloor() {
 		const geometry = new BoxGeometry(this.width, BLOCK_HEIGHT, BLOCK_DEPTH)
-		const material = specialMat
-			? new MeshBasicMaterial({ color: 0xff0000 })
-			: new MeshNormalMaterial({})
+
+		const material = new MeshStandardMaterial({
+			color: 0xe79fad,
+			emissive: 0x000000,
+			envMap: this.hdr,
+			envMapIntensity: 1,
+			metalness: 1,
+			roughness: 0.3,
+		})
 		const cube = new Mesh(geometry, material)
 		this.container.add(cube)
 

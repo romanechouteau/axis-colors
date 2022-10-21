@@ -19,6 +19,7 @@ export default class BlockManager {
 		this.dangerManager = options.dangerManager
 		this.worldPosition = options.worldPosition
 		this.playerManager = options.playerManager
+		this.hdr = options.hdr
 
 		this.container = new Object3D()
 		this.currentX = 0
@@ -96,7 +97,8 @@ export default class BlockManager {
 				position: new Vector3(this.currentX, 0, 0),
 				physicsWorld: this.physicsWorld,
 				playerManager: this.playerManager,
-				dangerManager: this.dangerManager
+				dangerManager: this.dangerManager,
+				hdr: this.hdr,
 			})
 
 			this.container.add(block.container)
@@ -108,7 +110,10 @@ export default class BlockManager {
 
 	destroyBlocks() {
 		let x = this.blocks[0].position.x + this.blocks[0].width
-		const maxX = Math.min(-this.totalWidth, this.dangerManager.x + this.worldPosition.x)
+		const maxX = Math.min(
+			-this.totalWidth,
+			this.dangerManager.x + this.worldPosition.x
+		)
 		while (this.worldPosition.x + x < maxX) {
 			const toRemove = this.blocks.shift()
 			toRemove.destroy()

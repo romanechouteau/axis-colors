@@ -22,6 +22,7 @@ export default class Plateform {
 		this.isDouble = options.isDouble
 		this.isCenter = options.isCenter
 		this.physicsWorld = options.physicsWorld
+		this.hdr = options.hdr
 
 		this.geometries = []
 		this.materials = []
@@ -52,8 +53,9 @@ export default class Plateform {
 				this.isCenter ? 'purple' : this.id === 1 ? 'blue' : 'pink'
 			],
 			emissive: 0x000000,
+			metalness: 1,
 			roughness: 0,
-			// metalness: 1,
+			envMap: this.hdr,
 		})
 		plateform.material = material
 
@@ -66,8 +68,8 @@ export default class Plateform {
 		this.container.position.z = this.isCenter
 			? 0
 			: this.isLeft
-				? -BLOCK_DEPTH * 0.25
-				: BLOCK_DEPTH * 0.25
+			? -BLOCK_DEPTH * 0.25
+			: BLOCK_DEPTH * 0.25
 
 		const x = this.block.container.position.x + this.container.position.x
 		const y = this.block.container.position.y + this.container.position.y
@@ -97,7 +99,8 @@ export default class Plateform {
 
 	handlePlayerAfter(player) {
 		if (
-			!this.activated && (this.id === player.id || this.isCenter) &&
+			!this.activated &&
+			(this.id === player.id || this.isCenter) &&
 			player.container.position.x - SPHERE_RAY >= this.plateformRight
 		) {
 			this.handleError()
