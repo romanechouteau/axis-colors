@@ -113,6 +113,9 @@ export default class PlayerManager {
 		store.started = true
 		store.startTime = Date.now()
 		document.getElementById('start').style.display = 'none'
+		setTimeout(() => {
+			document.getElementById('colors').classList.add('is-hidden')
+		}, 3000)
 	}
 
 	toggleFusion(value) {
@@ -131,6 +134,14 @@ export default class PlayerManager {
 				this.players[i].handleDefusion()
 			}
 			return
+		}
+
+		if (value && !store.messageFusion) {
+			document.getElementById('sync').classList.remove('is-hidden')
+			setTimeout(() => {
+				document.getElementById('sync').classList.add('is-hidden')
+			}, 3000)
+			store.messageFusion = true
 		}
 
 		store.isFusion = value

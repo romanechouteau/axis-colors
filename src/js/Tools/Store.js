@@ -25,6 +25,8 @@ const store = {
 
 	virtualKeyboardOpen: false,
 	canRestart: false,
+
+	messageFusion: false,
 }
 
 export { store }

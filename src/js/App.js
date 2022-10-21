@@ -130,6 +130,9 @@ export default class App {
 		document.getElementById('start').style.display = 'block'
 		document.getElementById('end').style.display = 'none'
 		document.getElementById('lives').style.display = 'flex'
+		document.getElementById('colors').style.display = 'block'
+		document.getElementById('sync').style.display = 'block'
+		document.getElementById('buttons').style.display = 'block'
 	}
 }
 
