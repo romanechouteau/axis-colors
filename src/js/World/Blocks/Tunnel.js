@@ -1,15 +1,10 @@
-import { Object3D, Audio, MeshStandardMaterial } from 'three'
+import { Object3D, Audio } from 'three'
 import { ColliderDesc, RigidBodyDesc } from '@dimforge/rapier3d-compat'
 
 import LivesManager from '../LivesManager'
 import { store } from '../../Tools/Store'
 import { SPHERE_RAY } from '../Player'
 import { BLOCK_DEPTH, BLOCK_HEIGHT } from './Block'
-
-export const TUNNEL_COLORS = {
-	1: 0xa4c9e7,
-	2: 0xe79ebe,
-}
 
 export default class Tunnel {
 	constructor(options) {
@@ -19,12 +14,12 @@ export default class Tunnel {
 		this.assets = options.assets
 		this.isLeft = options.isLeft
 		this.isLoop = options.isLoop
+		this.material = options.material
 		this.listener = options.listener
 		this.physicsWorld = options.physicsWorld
 		this.hdr = options.hdr
 
 		this.geometries = []
-		this.materials = []
 		this.colliders = []
 
 		this.container = new Object3D()
@@ -53,18 +48,9 @@ export default class Tunnel {
 		const tunnel = this.assets.models.tunnel.scene.children[0].clone()
 		const radius = BLOCK_DEPTH * 0.27
 		const geometry = tunnel.geometry
-		const material = new MeshStandardMaterial({
-			color: TUNNEL_COLORS[this.id],
-			metalness: 1,
-			roughness: 0,
-			envMap: this.hdr,
-			transparent: true,
-			opacity: 0.7,
-		})
-		tunnel.material = material
+		tunnel.material = this.material
 
 		this.geometries.push(geometry)
-		this.materials.push(material)
 
 		this.container.add(tunnel)
 
@@ -96,18 +82,9 @@ export default class Tunnel {
 		}
 		const radius = BLOCK_DEPTH * 0.27
 		const geometry = tunnel.geometry
-		const material = new MeshStandardMaterial({
-			color: TUNNEL_COLORS[this.id],
-			metalness: 1,
-			roughness: 0,
-			envMap: this.hdr,
-			transparent: true,
-			opacity: 0.7,
-		})
-		tunnel.material = material
+		tunnel.material = this.material
 
 		this.geometries.push(geometry)
-		this.materials.push(material)
 
 		this.container.add(tunnel)
 

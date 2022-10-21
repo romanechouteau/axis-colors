@@ -1,16 +1,10 @@
+import { Object3D } from 'three'
 import { ColliderDesc, RigidBodyDesc } from '@dimforge/rapier3d-compat'
-import { MeshStandardMaterial, Object3D } from 'three'
 
 import LivesManager from '../LivesManager'
 import { store } from '../../Tools/Store'
 import { SPHERE_RAY } from '../Player'
 import { BLOCK_DEPTH } from './Block'
-
-export const PLATFORM_COLORS = {
-	pink: 0xffafd2,
-	blue: 0x5deff,
-	purple: 0xac78ff,
-}
 
 export default class Plateform {
 	constructor(options) {
@@ -21,11 +15,10 @@ export default class Plateform {
 		this.isLeft = options.isLeft
 		this.isDouble = options.isDouble
 		this.isCenter = options.isCenter
+		this.material = options.material
 		this.physicsWorld = options.physicsWorld
-		this.hdr = options.hdr
 
 		this.geometries = []
-		this.materials = []
 		this.colliders = []
 
 		this.container = new Object3D()
@@ -48,19 +41,9 @@ export default class Plateform {
 
 		const plateform = this.assets.models.plateform.scene.children[0].clone()
 		const geometry = plateform.geometry
-		const material = new MeshStandardMaterial({
-			color: PLATFORM_COLORS[
-				this.isCenter ? 'purple' : this.id === 1 ? 'blue' : 'pink'
-			],
-			emissive: 0x000000,
-			metalness: 1,
-			roughness: 0,
-			envMap: this.hdr,
-		})
-		plateform.material = material
+		plateform.material = this.material
 
 		this.geometries.push(geometry)
-		this.materials.push(material)
 
 		this.container.add(plateform)
 		this.container.position.y = 2
