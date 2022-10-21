@@ -52,8 +52,10 @@ export default class Block {
 	constructor(options) {
 		this.type = options.type
 		this.time = options.time
+		this.index = options.index
 		this.assets = options.assets
 		this.listener = options.listener
+		this.matrices = options.matrices
 		this.position = options.position
 		this.materials = options.materials
 		this.physicsWorld = options.physicsWorld
@@ -65,13 +67,14 @@ export default class Block {
 		this.colliders = []
 
 		this.container = new Object3D()
+		this.dummy = new Object3D()
 		this.init()
 	}
 
 	init() {
-		this.width = BLOCK_WIDTH * BLOCK_DIMENSIONS[this.type]
+		this.width = BLOCK_DIMENSIONS[this.type]
 		this.container.position.set(
-			this.position.x + this.width * 0.5,
+			this.position.x + this.width * BLOCK_WIDTH * 0.5,
 			this.position.y,
 			this.position.z
 		)
@@ -197,10 +200,13 @@ export default class Block {
 	// OBJECT CREATION
 
 	createFloor() {
-		const geometry = new BoxGeometry(this.width, BLOCK_HEIGHT, BLOCK_DEPTH)
-
-		const cube = new Mesh(geometry, this.materials.floorMaterial)
-		this.container.add(cube)
+		const matrices = []
+		for (let i = 0; i < this.width; i++) {
+			this.dummy.position.x = this.position.x + i * BLOCK_WIDTH
+			this.dummy.updateMatrix()
+			matrices.push(this.dummy.matrix.clone())
+		}
+		this.matrices.floor[this.index] = matrices
 
 		const rigidBody = RigidBodyDesc.fixed().setTranslation(
 			this.container.position.x,
@@ -210,14 +216,13 @@ export default class Block {
 		this.floorBody = this.physicsWorld.createRigidBody(rigidBody)
 
 		const collider = ColliderDesc.cuboid(
-			this.width * 0.5,
+			this.width * BLOCK_WIDTH * 0.5,
 			BLOCK_HEIGHT * 0.5,
 			BLOCK_DEPTH * 0.5
 		)
 
 		this.physicsWorld.createCollider(collider, this.floorBody)
 
-		this.geometries.push(geometry)
 		this.colliders.push(collider)
 	}
 

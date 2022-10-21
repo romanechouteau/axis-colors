@@ -1,7 +1,9 @@
-import { Object3D, Vector3, MeshStandardMaterial } from 'three'
+import { Object3D, Vector3, MeshStandardMaterial, BoxGeometry, InstancedMesh, DynamicDrawUsage } from 'three'
 
 import Block, {
+	BLOCK_DEPTH,
 	BLOCK_DIMENSIONS,
+	BLOCK_HEIGHT,
 	BLOCK_PROBABILITY,
 	BLOCK_TYPE,
 	BLOCK_TYPE_LIST,
@@ -37,6 +39,7 @@ export default class BlockManager {
 		this.currentX = 0
 		this.blocks = []
 		this.nextGenerate = 0
+		this.index = 0
 
 		this.init()
 	}
@@ -45,6 +48,7 @@ export default class BlockManager {
 
 	init() {
 		this.initMaterials()
+		this.initMeshes()
 		this.initBlocks()
 
 		this.time.on('tick', this.render)
@@ -53,6 +57,25 @@ export default class BlockManager {
 	initBlocks() {
 		this.currentX = -this.totalWidth
 		this.generateBlocks()
+	}
+
+	initMeshes() {
+		this.initFloor()
+
+		this.matrices = {
+			floor: this.floorMatrices
+		}
+	}
+
+	initFloor() {
+		const geometry = new BoxGeometry(this.width, BLOCK_HEIGHT, BLOCK_DEPTH)
+
+		this.floor = new InstancedMesh(geometry, this.floorMaterial, 500)
+		this.floor.instanceMatrix.setUsage(DynamicDrawUsage)
+
+		this.floorMatrices = []
+
+		this.container.add(this.floor)
 	}
 
 	initMaterials() {
@@ -103,6 +126,23 @@ export default class BlockManager {
 			tunnelMaterials: this.tunnelMaterials,
 			platformMaterials: this.platformMaterials
 		}
+	}
+
+	// UPDATE
+
+	updateFloorMatrices() {
+		let curr = 0
+
+		for (let i = 0; i < this.floorMatrices.length; i++) {
+			const matrixList = this.floorMatrices[i]
+			if (matrixList === null || matrixList === undefined) continue
+			for (let j = 0; j < matrixList.length; j++) {
+				this.floor.setMatrixAt(curr, matrixList[j])
+				curr++
+			}
+		}
+
+		this.floor.instanceMatrix.needsUpdate = true
 	}
 
 	// GENERATORS
@@ -161,6 +201,7 @@ export default class BlockManager {
 			const block = new Block({
 				type,
 				time: this.time,
+				index: this.index,
 				assets: this.assets,
 				listener: this.listener,
 				position: new Vector3(this.currentX, 0, 0),
@@ -168,13 +209,18 @@ export default class BlockManager {
 				playerManager: this.playerManager,
 				dangerManager: this.dangerManager,
 				materials: this.materials,
+				matrices: this.matrices
 			})
 
 			this.container.add(block.container)
 
 			this.currentX += BLOCK_DIMENSIONS[type] * BLOCK_WIDTH
 			this.blocks.push(block)
+
+			this.index++
 		}
+
+		this.updateFloorMatrices()
 	}
 
 	// DESTROY
@@ -187,6 +233,7 @@ export default class BlockManager {
 		)
 		while (this.worldPosition.x + x < maxX) {
 			const toRemove = this.blocks.shift()
+			this.floorMatrices[toRemove.index] = null
 			toRemove.destroy()
 			x = this.blocks[0].position.x + this.blocks[0].width
 		}
