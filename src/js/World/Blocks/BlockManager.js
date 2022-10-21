@@ -1,4 +1,9 @@
-import { Object3D, Vector3, MeshStandardMaterial } from 'three'
+import {
+	Object3D,
+	Vector3,
+	MeshStandardMaterial,
+	MeshMatcapMaterial,
+} from 'three'
 
 import Block, {
 	BLOCK_DIMENSIONS,
@@ -68,6 +73,13 @@ export default class BlockManager {
 		this.buttonMaterial = new MeshMatcapMaterial({
 			matcap: this.assets.textures.gold,
 		})
+		this.buttonMaterialInside = new MeshStandardMaterial({
+			color: BUTTON_COLOR,
+			emissive: 0x000000,
+			metalness: 1,
+			roughness: 0,
+			envMap: this.hdr,
+		})
 
 		this.tunnelMaterials = []
 		this.platformMaterials = []
@@ -97,6 +109,7 @@ export default class BlockManager {
 		this.materials = {
 			floorMaterial: this.floorMaterial,
 			buttonMaterial: this.buttonMaterial,
+			buttonMaterialInside: this.buttonMaterialInside,
 			tunnelMaterials: this.tunnelMaterials,
 			platformMaterials: this.platformMaterials,
 		}

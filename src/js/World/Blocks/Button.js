@@ -14,6 +14,7 @@ export default class Button {
 		this.listener = options.listener
 		this.isCenter = options.isCenter
 		this.material = options.material
+		this.materialInside = options.materialInside
 		this.dangerManager = options.dangerManager
 
 		this.geometries = []
@@ -39,6 +40,7 @@ export default class Button {
 		const buttonOutside = button.children[0]
 		const buttonInside = button.children[1]
 		const geometries = [buttonOutside.geometry, buttonInside.geometry]
+		buttonInside.material = this.materialInside
 		buttonOutside.material = this.material
 
 		this.geometries.push(...geometries)

@@ -179,6 +179,7 @@ export default class Block {
 			isCenter: Math.random() > 0.5,
 			listener: this.listener,
 			material: this.materials.buttonMaterial,
+			materialInside: this.materials.buttonMaterialInside,
 			dangerManager: this.dangerManager,
 		})
 
