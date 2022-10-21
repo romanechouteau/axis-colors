@@ -114,8 +114,8 @@ export default class Player {
 		this.a_jump = this.mixer.clipAction(this.jumpAnim)
 		this.jumpSitAnim = AnimationClip.findByName(animations, 'jumpsit')
 		this.a_jumpSit = this.mixer.clipAction(this.jumpSitAnim)
-		this.sitAnim = AnimationClip.findByName(animations, 'sitREST')
-		this.a_sit = this.mixer.clipAction(this.sitAnim)
+		// this.sitAnim = AnimationClip.findByName(animations, 'sitREST')
+		// this.a_sit = this.mixer.clipAction(this.sitAnim)
 	}
 
 	initPosition() {
@@ -235,7 +235,7 @@ export default class Player {
 		} else if (position.x === 0 && position.y === 0) {
 			animation.fadeOut(100).stop()
 			if (this.isFusion && this.id !== 1) {
-				this.a_sit.fadeIn(100).play()
+				// this.a_sit.fadeIn(100).play()
 			}
 		}
 
@@ -277,7 +277,7 @@ export default class Player {
 					this.isFusion = true
 
 					if (this.id !== 1) {
-						this.a_sit.fadeIn(100).play()
+						// this.a_sit.fadeIn(100).play()
 					}
 
 					this.playerBody.setTranslation({
@@ -314,7 +314,7 @@ export default class Player {
 					this.isFusion = false
 					this.defineFootColor()
 
-					this.a_sit.stop()
+					// this.a_sit.stop()
 					this.a_jumpSit.stop()
 					this.a_walkSit.stop()
 
