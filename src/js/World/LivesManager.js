@@ -29,7 +29,8 @@ class LivesManager {
 	}
 
 	handleLooseLife = (lives) => {
-		document.querySelector(`.lives_${lives + 1}`).classList.add('is-hidden')
+		const livesDiv = document.querySelector(`.lives_${lives + 1}`)
+		livesDiv?.classList.add('is-hidden')
 		if (lives === 0) this.endGame()
 	}
 

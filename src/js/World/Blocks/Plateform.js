@@ -73,10 +73,10 @@ export default class Plateform {
 		const y = this.block.container.position.y + this.container.position.y
 		const z = this.block.container.position.z + this.container.position.z
 
-		this.plateformLeft = x - this.block.width * 0.33
-		this.plateformRight = x + this.block.width * 0.33
-		this.plateformFar = z - BLOCK_DEPTH * 0.5
-		this.plateformNear = z + BLOCK_DEPTH * 0.5
+		this.plateformLeft = x - this.block.width * 0.25
+		this.plateformRight = x + this.block.width * 0.25
+		this.plateformFar = z - BLOCK_DEPTH * 0.33
+		this.plateformNear = z + BLOCK_DEPTH * 0.33
 
 		return { geometry, x, y, z }
 	}

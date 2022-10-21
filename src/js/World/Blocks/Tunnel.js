@@ -70,8 +70,8 @@ export default class Tunnel {
 		const y = this.block.container.position.y + this.container.position.y
 		const z = this.block.container.position.z + this.container.position.z
 
-		this.tunnelLeft = x - this.block.width * 0.35
-		this.tunnelRight = x + this.block.width * 0.35
+		this.tunnelLeft = x - this.block.width * 0.27
+		this.tunnelRight = x + this.block.width * 0.27
 		this.tunnelFar = z - radius
 		this.tunnelNear = z + radius
 

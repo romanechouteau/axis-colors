@@ -212,7 +212,7 @@ export default class Player {
 			this.fusionBody.applyImpulse({ x: 0.0, y: 2, z: 0.0 }, true)
 			return
 		}
-		this.playerBody.applyImpulse({ x: 0.0, y: 0.8, z: 0.0 }, true)
+		this.playerBody.applyImpulse({ x: 0.0, y: 1.2, z: 0.0 }, true)
 	}
 
 	handleFusion() {
@@ -331,7 +331,7 @@ export default class Player {
 
 		const elapsed =
 			store.startTime === null ? 0 : this.time.current - store.startTime
-		this.speed = 3 + elapsed * 0.0002
+		this.speed = 3 + elapsed * 0.0001
 
 		this.checkFall()
 	}

@@ -57,6 +57,14 @@ export default class BlockManager {
 				!(
 					prevType === BLOCK_TYPE.empty_plateform &&
 					BLOCK_TYPE[key] === BLOCK_TYPE.empty
+				) &&
+				!(
+					prevType === BLOCK_TYPE.empty &&
+					BLOCK_TYPE[key] === BLOCK_TYPE.platform
+				) &&
+				!(
+					prevType === BLOCK_TYPE.platform &&
+					BLOCK_TYPE[key] === BLOCK_TYPE.empty
 				)
 		)
 
@@ -67,7 +75,6 @@ export default class BlockManager {
 			const type = BLOCK_TYPE[possibleTypes[i]]
 			const probability = BLOCK_PROBABILITY[type] / totalProbability
 			currentProbability += probability
-			console.log(possibleTypes[i], val, currentProbability)
 
 			if (val < currentProbability) {
 				return BLOCK_TYPE[possibleTypes[i]]
