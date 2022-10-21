@@ -124,9 +124,10 @@ export default class Block {
 	initPlatform() {
 		this.createFloor()
 
-		const isDouble = false
-		const isCenter = Math.random() > 0.5
+		const isLeft = Math.random() > 0.5
+		const isDouble = Math.random() > 0.5
 		const number = isDouble ? 2 : 1
+		this.plateforms = []
 
 		for (let i = 1; i <= number; i++) {
 			const plateform = new Plateform({
@@ -134,11 +135,13 @@ export default class Block {
 				time: this.time,
 				block: this,
 				assets: this.assets,
+				isLeft: i === 1 ? isLeft : !isLeft,
 				isDouble,
-				isCenter: isDouble ? false : isCenter,
+				isCenter: isDouble ? false :  Math.random() > 0.5,
 				physicsWorld: this.physicsWorld,
 			})
 
+			this.plateforms.push(plateform)
 			this.container.add(plateform.container)
 			this.geometries.push(...plateform.geometries)
 			this.materials.push(...plateform.materials)
