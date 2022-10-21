@@ -164,12 +164,14 @@ export default class World {
 
 	setDangerManager() {
 		this.dangerManager = new DangerManager({
+			assets: this.assets,
 			time: this.time,
 			camera: this.camera,
 			totalWidth: this.totalWidth,
 			dangerPass: this.dangerPass,
 			worldPosition: this.container.position,
 			playerManager: this.playerManager,
+			listener: this.listener,
 		})
 	}
 
@@ -209,7 +211,7 @@ export default class World {
 	}
 
 	updateWorldPosition() {
-		this.positionLerp.x =  -Math.min(
+		this.positionLerp.x = -Math.min(
 			this.playerManager.players[0].container.position.x,
 			this.playerManager.players[1].container.position.x
 		)

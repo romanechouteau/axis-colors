@@ -148,6 +148,10 @@ export default class Player {
 		this.s_jump = new Audio(this.listener)
 		this.s_jump.setBuffer(this.assets.sounds.jump)
 		this.s_jump.setVolume(0.2)
+
+		this.s_end = new Audio(this.listener)
+		this.s_end.setBuffer(this.assets.sounds.end)
+		this.s_end.setVolume(0.4)
 	}
 
 	initFootColor() {
@@ -325,6 +329,7 @@ export default class Player {
 	checkFall() {
 		if (this.container.position.y < -BLOCK_HEIGHT * 0.5 && !store.hasLost) {
 			LivesManager.loose()
+			this.s_end.play()
 		}
 	}
 
