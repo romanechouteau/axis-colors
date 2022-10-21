@@ -1,16 +1,18 @@
-import { Vector3 } from 'three'
+import { Vector3, Audio } from 'three'
 
 import LivesManager from './LivesManager'
 import { store } from '../Tools/Store'
 
 export default class DangerManager {
 	constructor(options) {
+		this.assets = options.assets
 		this.time = options.time
 		this.camera = options.camera
 		this.dangerPass = options.dangerPass
 		this.totalWidth = options.totalWidth
 		this.worldPosition = options.worldPosition
 		this.playerManager = options.playerManager
+		this.listener = options.listener
 
 		this.offset = 0
 
@@ -21,14 +23,22 @@ export default class DangerManager {
 		this.x = -this.totalWidth * 0.6
 		this.pos = new Vector3()
 
+		this.initSounds()
+
 		this.time.on('tick', this.render)
+	}
+
+	initSounds() {
+		this.s_end = new Audio(this.listener)
+		this.s_end.setBuffer(this.assets.sounds.end)
+		this.s_end.setVolume(0.4)
 	}
 
 	updatePosition() {
 		const elapsed =
-		store.startTime === null
-		? 0
-		: this.time.current - store.startTime + this.offset
+			store.startTime === null
+				? 0
+				: this.time.current - store.startTime + this.offset
 		const speed = 0.0005 + Math.max(elapsed, 0) * 0.0000001
 
 		this.x += this.time.delta * speed
@@ -54,6 +64,7 @@ export default class DangerManager {
 
 		if (playerX - this.x <= 0) {
 			LivesManager.loose()
+			this.s_end.play()
 		}
 	}
 

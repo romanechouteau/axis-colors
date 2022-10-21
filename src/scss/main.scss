@@ -7,12 +7,14 @@
 
 @font-face {
 	font-family: 'Rammetto One';
-	src: url('RammettoOne-Regular.eot');
-	src: url('RammettoOne-Regular.eot?#iefix') format('embedded-opentype'),
-		url('RammettoOne-Regular.woff2') format('woff2'),
-		url('RammettoOne-Regular.woff') format('woff'),
-		url('RammettoOne-Regular.ttf') format('truetype'),
-		url('RammettoOne-Regular.svg#RammettoOne-Regular') format('svg');
+	src: url('../../public/RammettoOne-Regular.eot');
+	src: url('../../public/RammettoOne-Regular.eot?#iefix')
+			format('embedded-opentype'),
+		url('../../public/RammettoOne-Regular.woff2') format('woff2'),
+		url('../../public/RammettoOne-Regular.woff') format('woff'),
+		url('../../public/RammettoOne-Regular.ttf') format('truetype'),
+		url('../../public/RammettoOne-Regular.svg#RammettoOne-Regular')
+			format('svg');
 	font-weight: normal;
 	font-style: normal;
 	font-display: swap;
