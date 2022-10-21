@@ -197,7 +197,7 @@ export default class Block {
 			emissive: 0x000000,
 			envMap: this.hdr,
 			envMapIntensity: 1,
-			metalness: 1,
+			metalness: 0.9,
 			roughness: 0.3,
 		})
 		const cube = new Mesh(geometry, material)

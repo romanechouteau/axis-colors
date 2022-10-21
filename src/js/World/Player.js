@@ -7,6 +7,7 @@ import {
 	AnimationClip,
 	AnimationMixer,
 	MeshStandardMaterial,
+	Color,
 } from 'three'
 import {
 	ColliderDesc,
@@ -23,6 +24,12 @@ import { store } from '../Tools/Store'
 export const SPHERE_RAY = 0.3
 export const SPHERE_FEET = 0.1
 const CONTAINER_SCALE = 0.3
+
+const PLAYER_COLORS = {
+	pink: 0xef397a,
+	blue: 0x1dcce4,
+	purple: 0x822bc7,
+}
 
 export default class Player {
 	constructor(options) {
@@ -82,6 +89,8 @@ export default class Player {
 			map: this.assets.textures[this.id === 1 ? 'pink' : 'blue'],
 		})
 
+		this.initFootColor()
+
 		this.initAnimations()
 
 		this.container.add(this.player)
@@ -139,6 +148,28 @@ export default class Player {
 		this.s_jump = new Audio(this.listener)
 		this.s_jump.setBuffer(this.assets.sounds.jump)
 		this.s_jump.setVolume(0.2)
+	}
+
+	initFootColor() {
+		this.pink = new Color(PLAYER_COLORS['purple'])
+		this.blue = new Color(PLAYER_COLORS['purple'])
+		this.purple = new Color(PLAYER_COLORS['purple'])
+		const footMaterial = new MeshStandardMaterial({
+			color: PLAYER_COLORS[this.id === 1 ? 'pink' : 'blue'],
+			emissive: 0x000000,
+			metalness: 0.5,
+		})
+		this.player.children[1].children[0].material = footMaterial
+	}
+
+	defineFootColor(isFusion) {
+		const color = isFusion
+			? this.purple
+			: this.id === 1
+			? this.pink
+			: this.blue
+		this.player.children[1].children[0].material.color = color
+		this.player.children[2].children[0].material.color = color
 	}
 
 	// EVENT HANDLERS
@@ -227,6 +258,7 @@ export default class Player {
 					this.container.scale.set(this.scale, this.scale, this.scale)
 				},
 				onComplete: () => {
+					this.defineFootColor(true)
 					this.fusionEvent.trigger('fusion')
 					this.isFusion = true
 
@@ -262,6 +294,7 @@ export default class Player {
 				onComplete: () => {
 					this.fusionEvent.trigger('defusion')
 					this.isFusion = false
+					this.defineFootColor()
 
 					this.a_jumpSit.stop()
 					this.a_walkSit.stop()
