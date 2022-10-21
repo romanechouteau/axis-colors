@@ -28,7 +28,7 @@ const CONTAINER_SCALE = 0.3
 const PLAYER_COLORS = {
 	pink: 0xef397a,
 	blue: 0x1dcce4,
-	purple: 0x822bc7,
+	purple: 0xac78ff,
 }
 
 export default class Player {
@@ -157,8 +157,8 @@ export default class Player {
 	}
 
 	initFootColor() {
-		this.pink = new Color(PLAYER_COLORS['purple'])
-		this.blue = new Color(PLAYER_COLORS['purple'])
+		this.pink = new Color(PLAYER_COLORS['pink'])
+		this.blue = new Color(PLAYER_COLORS['blue'])
 		this.purple = new Color(PLAYER_COLORS['purple'])
 
 		const footMaterial = new MeshStandardMaterial({
@@ -176,6 +176,7 @@ export default class Player {
 			: this.id === 1
 			? this.pink
 			: this.blue
+
 		this.player.children[1].children[0].material.color = color
 		this.player.children[2].children[0].material.color = color
 	}

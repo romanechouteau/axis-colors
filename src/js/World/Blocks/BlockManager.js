@@ -1,4 +1,12 @@
-import { Object3D, Vector3, MeshStandardMaterial, BoxGeometry, InstancedMesh, DynamicDrawUsage } from 'three'
+import {
+	Object3D,
+	Vector3,
+	BoxGeometry,
+	InstancedMesh,
+	DynamicDrawUsage,
+	MeshStandardMaterial,
+	MeshMatcapMaterial,
+} from 'three'
 
 import Block, {
 	BLOCK_DEPTH,
@@ -88,11 +96,15 @@ export default class BlockManager {
 			roughness: 0.3,
 		})
 
-		this.buttonMaterial = new MeshStandardMaterial({
+		this.buttonMaterial = new MeshMatcapMaterial({
+			matcap: this.assets.textures.gold,
+		})
+		this.buttonMaterialInside = new MeshStandardMaterial({
 			color: BUTTON_COLOR,
 			emissive: 0x000000,
-			roughness: 1,
-      metalness: 1
+			metalness: 1,
+			roughness: 0,
+			envMap: this.hdr,
 		})
 
 		this.tunnelMaterials = []
@@ -123,8 +135,9 @@ export default class BlockManager {
 		this.materials = {
 			floorMaterial: this.floorMaterial,
 			buttonMaterial: this.buttonMaterial,
+			buttonMaterialInside: this.buttonMaterialInside,
 			tunnelMaterials: this.tunnelMaterials,
-			platformMaterials: this.platformMaterials
+			platformMaterials: this.platformMaterials,
 		}
 	}
 
@@ -158,7 +171,8 @@ export default class BlockManager {
 
 		const possibleTypes = BLOCK_TYPE_LIST.filter(
 			(key) =>
-				(BLOCK_TYPE[key] !== prevType || BLOCK_TYPE[key] === BLOCK_TYPE.normal) &&
+				(BLOCK_TYPE[key] !== prevType ||
+					BLOCK_TYPE[key] === BLOCK_TYPE.normal) &&
 				!(
 					prevType === BLOCK_TYPE.empty &&
 					BLOCK_TYPE[key] === BLOCK_TYPE.empty_plateform
@@ -177,7 +191,10 @@ export default class BlockManager {
 				)
 		)
 
-		const totalProbability = possibleTypes.reduce((acc, type) => acc + BLOCK_PROBABILITY[BLOCK_TYPE[type]], 0)
+		const totalProbability = possibleTypes.reduce(
+			(acc, type) => acc + BLOCK_PROBABILITY[BLOCK_TYPE[type]],
+			0
+		)
 		let currentProbability = 0
 
 		for (let i = 0; i < possibleTypes.length; i++) {

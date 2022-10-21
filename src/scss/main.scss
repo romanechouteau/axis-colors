@@ -104,6 +104,45 @@
 	color: black;
 }
 
+#colors {
+	position: absolute;
+	top: 200px;
+	left: 50vw;
+	transform: translateX(-50%);
+	transition: opacity 0.3s ease-out;
+
+	img {
+		height: 200px;
+	}
+	&.is-hidden {
+		opacity: 0;
+	}
+}
+
+#sync {
+	position: absolute;
+	top: 250px;
+	left: 50vw;
+	transform: translateX(-50%);
+	transition: opacity 0.3s ease-out;
+
+	img {
+		height: 80px;
+	}
+	&.is-hidden {
+		opacity: 0;
+	}
+}
+
+#buttons {
+	position: absolute;
+	bottom: 80px;
+	left: 80px;
+	img {
+		height: 80px;
+	}
+}
+
 #lives {
 	position: absolute;
 	top: 80px;
@@ -121,7 +160,7 @@
 			position: absolute;
 			top: 0;
 			left: 0;
-			transform: opacity 0.3s ease-out;
+			transition: opacity 0.3s ease-out;
 		}
 
 		&.is-hidden {

@@ -14,6 +14,7 @@ export default class Button {
 		this.listener = options.listener
 		this.isCenter = options.isCenter
 		this.material = options.material
+		this.materialInside = options.materialInside
 		this.dangerManager = options.dangerManager
 
 		this.geometries = []
@@ -27,7 +28,7 @@ export default class Button {
 
 	init() {
 		this.initModel()
-    this.initSounds()
+		this.initSounds()
 
 		this.time.on('tick', this.render)
 	}
@@ -36,21 +37,22 @@ export default class Button {
 		// MODEL
 
 		const button = this.assets.models.button.scene.children[0].clone()
-    const buttonOutside = button.children[0]
-    const buttonInside= button.children[1]
+		const buttonOutside = button.children[0]
+		const buttonInside = button.children[1]
 		const geometries = [buttonOutside.geometry, buttonInside.geometry]
-		buttonInside.material = this.material
+		buttonInside.material = this.materialInside
+		buttonOutside.material = this.material
 
 		this.geometries.push(...geometries)
 
 		this.container.add(button)
-    this.container.position.y = 1
+		this.container.position.y = 1
 
 		this.container.position.z = this.isCenter
 			? 0
 			: this.isLeft
-				? -BLOCK_DEPTH * 0.25
-				: BLOCK_DEPTH * 0.25
+			? -BLOCK_DEPTH * 0.25
+			: BLOCK_DEPTH * 0.25
 
 		const x = this.block.container.position.x + this.container.position.x
 		const z = this.block.container.position.z + this.container.position.z
@@ -61,7 +63,7 @@ export default class Button {
 		this.buttonNear = z + BLOCK_DEPTH * 0.33
 	}
 
-  initSounds() {
+	initSounds() {
 		this.s_button = new Audio(this.listener)
 		this.s_button.setBuffer(this.assets.sounds.button)
 		this.s_button.setVolume(0.4)
@@ -72,8 +74,9 @@ export default class Button {
 			player.container.position.x + SPHERE_RAY >= this.buttonLeft &&
 			player.container.position.x - SPHERE_RAY <= this.buttonRight
 
-		const insideY = player.container.position.y - SPHERE_RAY >= BLOCK_HEIGHT * 0.5
-      && player.container.position.y - SPHERE_RAY <= BLOCK_HEIGHT * 0.5 + 0.5
+		const insideY =
+			player.container.position.y - SPHERE_RAY >= BLOCK_HEIGHT * 0.5 &&
+			player.container.position.y - SPHERE_RAY <= BLOCK_HEIGHT * 0.5 + 0.5
 
 		const insideZ =
 			player.container.position.z - SPHERE_RAY >= this.buttonFar &&
@@ -83,23 +86,23 @@ export default class Button {
 			return
 		}
 
-    this.activated = true
-    this.activateButton()
+		this.activated = true
+		this.activateButton()
 	}
 
-  activateButton() {
-    const pos = this.container.position
-    gsap.to(this.container.position, {
-      y: pos.y - 0.04,
-      duration: 0.3,
-      ease: 'power1.easeOut'
-    })
-    this.dangerManager.slowDown()
-    this.s_button.play()
-  }
+	activateButton() {
+		const pos = this.container.position
+		gsap.to(this.container.position, {
+			y: pos.y - 0.04,
+			duration: 0.3,
+			ease: 'power1.easeOut',
+		})
+		this.dangerManager.slowDown()
+		this.s_button.play()
+	}
 
 	render = () => {
-    if (this.activated === true || !store.isFusion) return
-    this.handlePlayerOn(this.block.playerManager.players[0])
+		if (this.activated === true || !store.isFusion) return
+		this.handlePlayerOn(this.block.playerManager.players[0])
 	}
 }
