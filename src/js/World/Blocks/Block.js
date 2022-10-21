@@ -1,11 +1,4 @@
-import {
-	BoxGeometry,
-	Mesh,
-	MeshBasicMaterial,
-	MeshNormalMaterial,
-	MeshStandardMaterial,
-	Object3D,
-} from 'three'
+import { BoxGeometry, Mesh, MeshStandardMaterial, Object3D } from 'three'
 import { ColliderDesc, RigidBodyDesc } from '@dimforge/rapier3d-compat'
 
 import Button from './Button'
@@ -17,9 +10,9 @@ export const BLOCK_TYPE = {
 	tunnel: 1,
 	platform: 2,
 	empty: 3,
-	empty_plateform: 4,
-	button: 5,
-	enemy: 6,
+	button: 4,
+	// empty_plateform: 5,
+	// enemy: 6,
 }
 
 export const BLOCK_TYPE_LIST = Object.keys(BLOCK_TYPE)
@@ -35,10 +28,33 @@ export const BLOCK_DIMENSIONS = {
 	[BLOCK_TYPE.enemy]: 3,
 }
 
+// TYPE DIMENSIONS
+export const BLOCK_PROBABILITY = {
+	[BLOCK_TYPE.normal]: 15,
+	[BLOCK_TYPE.tunnel]: 2,
+	[BLOCK_TYPE.platform]: 2,
+	[BLOCK_TYPE.empty]: 3,
+	[BLOCK_TYPE.button]: 1,
+	[BLOCK_TYPE.empty_plateform]: 1,
+	[BLOCK_TYPE.enemy]: 1,
+}
+
 // BLOCK DIMENSIONS
 export const BLOCK_WIDTH = 1
 export const BLOCK_DEPTH = 3
 export const BLOCK_HEIGHT = 2
+
+// COLORS
+const TUNNEL_COLORS = {
+	1: 0xa4c9e7,
+	2: 0xe79ebe,
+}
+const BUTTON_COLOR = 0xac78ff
+const PLATFORM_COLORS = {
+	0: 0xac78ff,
+	1: 0x5deff,
+	2: 0xffafd2,
+}
 
 export default class Block {
 	constructor(options) {
@@ -53,7 +69,6 @@ export default class Block {
 		this.hdr = options.hdr
 
 		this.geometries = []
-		this.materials = []
 		this.colliders = []
 
 		this.container = new Object3D()
@@ -67,6 +82,8 @@ export default class Block {
 			this.position.y,
 			this.position.z
 		)
+
+		this.initMaterials()
 
 		switch (this.type) {
 			case BLOCK_TYPE.normal:
@@ -95,6 +112,49 @@ export default class Block {
 
 	// BLOCK INITIALIZERS
 
+	initMaterials() {
+		this.floorMaterial = new MeshStandardMaterial({
+			color: 0xe79fad,
+			emissive: 0x000000,
+			envMap: this.hdr,
+			envMapIntensity: 1,
+			metalness: 0.9,
+			roughness: 0.3,
+		})
+
+		this.buttonMaterial = new MeshStandardMaterial({
+			color: BUTTON_COLOR,
+			emissive: 0x000000,
+			roughness: 1,
+			metalness: 1,
+		})
+
+		this.tunnelMaterials = []
+		this.platformMaterials = []
+
+		for (let i = 0; i <= 2; i++) {
+			const platformMaterial = new MeshStandardMaterial({
+				color: PLATFORM_COLORS[i],
+				emissive: 0x000000,
+				metalness: 1,
+				roughness: 0,
+				envMap: this.hdr,
+			})
+			this.platformMaterials[i] = platformMaterial
+
+			if (i === 0) continue
+			const tunnelMaterial = new MeshStandardMaterial({
+				color: TUNNEL_COLORS[i],
+				metalness: 1,
+				roughness: 0,
+				envMap: this.hdr,
+				transparent: true,
+				opacity: 0.7,
+			})
+			this.tunnelMaterials[i] = tunnelMaterial
+		}
+	}
+
 	initNormal() {
 		this.createFloor()
 	}
@@ -114,6 +174,7 @@ export default class Block {
 				assets: this.assets,
 				isLeft: i === 1 ? isLeft : !isLeft,
 				isLoop,
+				material: this.tunnelMaterials[i],
 				listener: this.listener,
 				physicsWorld: this.physicsWorld,
 				hdr: this.hdr,
@@ -122,7 +183,6 @@ export default class Block {
 			this.tunnels.push(tunnel)
 			this.container.add(tunnel.container)
 			this.geometries.push(...tunnel.geometries)
-			this.materials.push(...tunnel.materials)
 			this.colliders.push(...tunnel.colliders)
 		}
 	}
@@ -132,6 +192,7 @@ export default class Block {
 
 		const isLeft = Math.random() > 0.5
 		const isDouble = Math.random() > 0.5
+		const isCenter = isDouble ? false : Math.random() > 0.5
 		const number = isDouble ? 2 : 1
 		this.plateforms = []
 
@@ -143,15 +204,14 @@ export default class Block {
 				assets: this.assets,
 				isLeft: i === 1 ? isLeft : !isLeft,
 				isDouble,
-				isCenter: isDouble ? false : Math.random() > 0.5,
+				material: this.platformMaterials[isCenter ? 0 : i],
+				isCenter: isCenter,
 				physicsWorld: this.physicsWorld,
-				hdr: this.hdr,
 			})
 
 			this.plateforms.push(plateform)
 			this.container.add(plateform.container)
 			this.geometries.push(...plateform.geometries)
-			this.materials.push(...plateform.materials)
 			this.colliders.push(...plateform.colliders)
 		}
 	}
@@ -175,12 +235,12 @@ export default class Block {
 			isLeft: Math.random() > 0.5,
 			isCenter: Math.random() > 0.5,
 			listener: this.listener,
+			material: this.buttonMaterial,
 			dangerManager: this.dangerManager,
 		})
 
 		this.container.add(this.button.container)
 		this.geometries.push(...this.button.geometries)
-		this.materials.push(...this.button.materials)
 	}
 
 	initEnemy() {
@@ -192,15 +252,7 @@ export default class Block {
 	createFloor() {
 		const geometry = new BoxGeometry(this.width, BLOCK_HEIGHT, BLOCK_DEPTH)
 
-		const material = new MeshStandardMaterial({
-			color: 0xe79fad,
-			emissive: 0x000000,
-			envMap: this.hdr,
-			envMapIntensity: 1,
-			metalness: 0.9,
-			roughness: 0.3,
-		})
-		const cube = new Mesh(geometry, material)
+		const cube = new Mesh(geometry, this.floorMaterial)
 		this.container.add(cube)
 
 		const rigidBody = RigidBodyDesc.fixed().setTranslation(
@@ -219,7 +271,6 @@ export default class Block {
 		this.physicsWorld.createCollider(collider, this.floorBody)
 
 		this.geometries.push(geometry)
-		this.materials.push(material)
 		this.colliders.push(collider)
 	}
 
@@ -230,11 +281,6 @@ export default class Block {
 			geometry.dispose()
 		})
 		this.geometries = []
-
-		this.materials.forEach((material) => {
-			material.dispose()
-		})
-		this.materials = []
 
 		this.colliders.forEach((collider) => {
 			this.physicsWorld.removeCollider(collider)

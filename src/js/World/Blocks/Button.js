@@ -1,11 +1,9 @@
 import gsap from 'gsap'
-import { MeshStandardMaterial, Object3D, Audio } from 'three'
+import { Object3D, Audio } from 'three'
 
 import { store } from '../../Tools/Store'
 import { SPHERE_RAY } from '../Player'
 import { BLOCK_DEPTH, BLOCK_HEIGHT } from './Block'
-
-export const BUTTON_COLOR = 0xac78ff
 
 export default class Button {
 	constructor(options) {
@@ -15,10 +13,10 @@ export default class Button {
 		this.isLeft = options.isLeft
 		this.listener = options.listener
 		this.isCenter = options.isCenter
+		this.material = options.material
 		this.dangerManager = options.dangerManager
 
 		this.geometries = []
-		this.materials = []
 
 		this.container = new Object3D()
 
@@ -41,16 +39,9 @@ export default class Button {
     const buttonOutside = button.children[0]
     const buttonInside= button.children[1]
 		const geometries = [buttonOutside.geometry, buttonInside.geometry]
-		const material = new MeshStandardMaterial({
-			color: BUTTON_COLOR,
-			emissive: 0x000000,
-			roughness: 1,
-      metalness: 1
-		})
-		buttonInside.material = material
+		buttonInside.material = this.material
 
 		this.geometries.push(...geometries)
-		this.materials.push(material)
 
 		this.container.add(button)
     this.container.position.y = 1

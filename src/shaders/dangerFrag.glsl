@@ -13,7 +13,7 @@ void main() {
 
   vec4 greyColor = vec4(greyscale(baseColor.rgb), baseColor.a);
 
-  float stepProgress = step(uProgress, vUv.x);
+  float stepProgress = smoothstep(uProgress - 0.05, uProgress + 0.05, vUv.x);
   vec4 color = mix(greyColor, baseColor, stepProgress);
 
   gl_FragColor = color;

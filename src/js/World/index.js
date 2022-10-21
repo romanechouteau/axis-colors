@@ -48,6 +48,8 @@ export default class World {
 		this.container = new Object3D()
 		this.container.name = 'World'
 
+		this.positionLerp = this.container.position.clone()
+
 		if (this.debug) {
 			this.debug.setFolder('Test')
 		}
@@ -207,12 +209,12 @@ export default class World {
 	}
 
 	updateWorldPosition() {
-		const currentX = Math.min(
+		this.positionLerp.x =  -Math.min(
 			this.playerManager.players[0].container.position.x,
 			this.playerManager.players[1].container.position.x
 		)
 
-		this.container.position.x = -currentX
+		this.container.position.lerp(this.positionLerp, 0.2)
 	}
 
 	updateTimer() {
