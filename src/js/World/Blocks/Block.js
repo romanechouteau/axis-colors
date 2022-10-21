@@ -16,9 +16,9 @@ export const BLOCK_TYPE = {
 	tunnel: 1,
 	platform: 2,
 	empty: 3,
-	empty_plateform: 4,
-	button: 5,
-	enemy: 6,
+	button: 4,
+	// empty_plateform: 5,
+	// enemy: 6,
 }
 
 export const BLOCK_TYPE_LIST = Object.keys(BLOCK_TYPE)
@@ -32,6 +32,17 @@ export const BLOCK_DIMENSIONS = {
 	[BLOCK_TYPE.empty_plateform]: 6,
 	[BLOCK_TYPE.button]: 3,
 	[BLOCK_TYPE.enemy]: 3,
+}
+
+// TYPE DIMENSIONS
+export const BLOCK_PROBABILITY = {
+	[BLOCK_TYPE.normal]: 15,
+	[BLOCK_TYPE.tunnel]: 2,
+	[BLOCK_TYPE.platform]: 2,
+	[BLOCK_TYPE.empty]: 3,
+	[BLOCK_TYPE.button]: 1,
+	[BLOCK_TYPE.empty_plateform]: 1,
+	[BLOCK_TYPE.enemy]: 1,
 }
 
 // BLOCK DIMENSIONS

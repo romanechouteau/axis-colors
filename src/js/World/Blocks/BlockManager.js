@@ -2,6 +2,7 @@ import { Object3D, Vector3 } from 'three'
 
 import Block, {
 	BLOCK_DIMENSIONS,
+	BLOCK_PROBABILITY,
 	BLOCK_TYPE,
 	BLOCK_TYPE_LIST,
 	BLOCK_WIDTH,
@@ -48,7 +49,7 @@ export default class BlockManager {
 
 		const possibleTypes = BLOCK_TYPE_LIST.filter(
 			(key) =>
-				BLOCK_TYPE[key] !== prevType &&
+				(BLOCK_TYPE[key] !== prevType || BLOCK_TYPE[key] === BLOCK_TYPE.normal) &&
 				!(
 					prevType === BLOCK_TYPE.empty &&
 					BLOCK_TYPE[key] === BLOCK_TYPE.empty_plateform
@@ -58,10 +59,17 @@ export default class BlockManager {
 					BLOCK_TYPE[key] === BLOCK_TYPE.empty
 				)
 		)
-		const probability = 1 / possibleTypes.length
+
+		const totalProbability = possibleTypes.reduce((acc, type) => acc + BLOCK_PROBABILITY[BLOCK_TYPE[type]], 0)
+		let currentProbability = 0
 
 		for (let i = 0; i < possibleTypes.length; i++) {
-			if (val < probability * (i + 1)) {
+			const type = BLOCK_TYPE[possibleTypes[i]]
+			const probability = BLOCK_PROBABILITY[type] / totalProbability
+			currentProbability += probability
+			console.log(possibleTypes[i], val, currentProbability)
+
+			if (val < currentProbability) {
 				return BLOCK_TYPE[possibleTypes[i]]
 			}
 		}
