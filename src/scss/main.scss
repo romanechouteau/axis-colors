@@ -52,6 +52,8 @@
 	z-index: 3;
 	color: black;
 	background-color: white;
+	transition: opacity 0.3s ease-out;
+
 	.input {
 		color: grey;
 		position: absolute;
@@ -64,6 +66,9 @@
 	video,
 	img {
 		width: 100vw;
+	}
+	&.is-hidden {
+		opacity: 0;
 	}
 }
 

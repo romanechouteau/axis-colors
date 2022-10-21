@@ -134,7 +134,8 @@ export default class App {
 
 	setScreens() {
 		document.getElementById('start').style.display = 'block'
-		document.getElementById('end').style.display = 'none'
+		document.getElementById('end').style.display = 'block'
+
 		document.getElementById('lives').style.display = 'flex'
 		document.getElementById('colors').style.display = 'block'
 		document.getElementById('sync').style.display = 'block'
