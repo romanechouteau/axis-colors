@@ -1,7 +1,7 @@
 import { Vector3 } from 'three'
 
-import { store } from '../Tools/Store'
 import LivesManager from './LivesManager'
+import { store } from '../Tools/Store'
 
 export default class DangerManager {
 	constructor(options) {
@@ -11,6 +11,8 @@ export default class DangerManager {
 		this.totalWidth = options.totalWidth
 		this.worldPosition = options.worldPosition
 		this.playerManager = options.playerManager
+
+		this.offset = 0
 
 		this.init()
 	}
@@ -24,8 +26,10 @@ export default class DangerManager {
 
 	updatePosition() {
 		const elapsed =
-			store.startTime === null ? 0 : this.time.current - store.startTime
-		const speed = 0.0005 + elapsed * 0.0000001
+		store.startTime === null
+		? 0
+		: this.time.current - store.startTime + this.offset
+		const speed = 0.0005 + Math.max(elapsed, 0) * 0.0000001
 
 		this.x += this.time.delta * speed
 
@@ -51,6 +55,10 @@ export default class DangerManager {
 		if (playerX - this.x <= 0) {
 			LivesManager.loose()
 		}
+	}
+
+	slowDown() {
+		this.offset -= 8000
 	}
 
 	render = () => {

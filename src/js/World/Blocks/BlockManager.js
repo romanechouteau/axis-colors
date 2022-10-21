@@ -82,6 +82,7 @@ export default class BlockManager {
 				position: new Vector3(this.currentX, 0, 0),
 				physicsWorld: this.physicsWorld,
 				playerManager: this.playerManager,
+				dangerManager: this.dangerManager,
 				hdr: this.hdr,
 			})
 

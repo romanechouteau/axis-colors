@@ -6,6 +6,8 @@ import {
 	Object3D,
 } from 'three'
 import { ColliderDesc, RigidBodyDesc } from '@dimforge/rapier3d-compat'
+
+import Button from './Button'
 import Tunnel from './Tunnel'
 import Plateform from './Plateform'
 
@@ -45,6 +47,7 @@ export default class Block {
 		this.listener = options.listener
 		this.position = options.position
 		this.physicsWorld = options.physicsWorld
+		this.dangerManager = options.dangerManager
 		this.playerManager = options.playerManager
 		this.hdr = options.hdr
 
@@ -163,6 +166,20 @@ export default class Block {
 
 	initButton() {
 		this.createFloor()
+
+		this.button = new Button({
+			time: this.time,
+			block: this,
+			assets: this.assets,
+			isLeft: Math.random() > 0.5,
+			isCenter: Math.random() > 0.5,
+			listener: this.listener,
+			dangerManager: this.dangerManager
+		})
+
+		this.container.add(this.button.container)
+		this.geometries.push(...this.button.geometries)
+		this.materials.push(...this.button.materials)
 	}
 
 	initEnemy() {
