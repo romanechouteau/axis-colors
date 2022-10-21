@@ -10,11 +10,12 @@
 		<div id="app">
 			<canvas id="_canvas"></canvas>
 			<div class="startScreen" style="display: none" id="start">
-				<h1>Start</h1>
+				<video src="/src/assets/intro.mp4" muted autoplay loop />
 			</div>
 			<div class="endScreen" style="display: none" id="end">
-				<h1>End</h1>
+				<img src="/src/assets/end.png" alt="" />
 				<input class="input" type="text" />
+				<div id="leaderboard"></div>
 			</div>
 			<div class="overlays">
 				<div class="timer" id="timer"></div>

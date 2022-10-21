@@ -60,30 +60,32 @@ class LivesManager {
 					// Get all scores
 					this.leaderboard.getScores().then((response) => {
 						store.canRestart = true
-						for (let i = 0; i < response.length; i++) {
+						for (let i = 0; i < 4; i++) {
 							const resp = response[i]
 							const time = new Date(resp.value)
 
-							const div = document.createElement('div')
+							const div = document.getElementById('leaderboard')
 
-							const username = document.createElement('h2')
-							username.innerHTML = resp.username
-							const score = document.createElement('p')
-							score.innerHTML = `${time
-								.getMinutes()
-								.toString()
-								.padStart(2, '0')}:${time
-								.getSeconds()
-								.toString()
-								.padStart(2, '0')}:${time
-								.getMilliseconds()
-								.toString()
-								.padStart(3, '0')}`
+							const wrapper = document.createElement('div')
 
-							div.appendChild(username)
-							div.appendChild(score)
+							const value = document.createElement('h2')
+							value.innerHTML =
+								resp.username +
+								' - ' +
+								`${time
+									.getMinutes()
+									.toString()
+									.padStart(2, '0')}:${time
+									.getSeconds()
+									.toString()
+									.padStart(2, '0')}:${time
+									.getMilliseconds()
+									.toString()
+									.padStart(3, '0')}`
 
-							endScreen.appendChild(div)
+							wrapper.appendChild(value)
+
+							div.appendChild(wrapper)
 						}
 					})
 				})
