@@ -39,6 +39,7 @@ export default class Player {
 		this.listener = options.listener
 		this.fusionBody = options.fusionBody
 		this.physicsWorld = options.physicsWorld
+		this.hdr = options.hdr
 
 		this.container = new Object3D()
 		this.velocity = new Vector2()
@@ -85,7 +86,8 @@ export default class Player {
 		const body = this.player.children[0].children[0]
 		body.material = new MeshStandardMaterial({
 			roughness: 0,
-			metalness: 0,
+			metalness: 0.6,
+			envMap: this.hdr,
 			map: this.assets.textures[this.id === 1 ? 'pink' : 'blue'],
 		})
 
@@ -158,12 +160,14 @@ export default class Player {
 		this.pink = new Color(PLAYER_COLORS['purple'])
 		this.blue = new Color(PLAYER_COLORS['purple'])
 		this.purple = new Color(PLAYER_COLORS['purple'])
+
 		const footMaterial = new MeshStandardMaterial({
 			color: PLAYER_COLORS[this.id === 1 ? 'pink' : 'blue'],
 			emissive: 0x000000,
 			metalness: 0.5,
 		})
 		this.player.children[1].children[0].material = footMaterial
+		this.player.children[2].children[0].material = footMaterial
 	}
 
 	defineFootColor(isFusion) {

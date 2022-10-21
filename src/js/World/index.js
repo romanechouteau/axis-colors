@@ -156,6 +156,7 @@ export default class World {
 			assets: this.assets,
 			physicsWorld: this.physicsWorld,
 			listener: this.listener,
+			hdr: this.hdr,
 		})
 		this.container.add(this.playerManager.container)
 	}
