@@ -23,8 +23,6 @@ import Background from './Background'
 import BlockManager from './Blocks/BlockManager'
 import DangerManager from './DangerManager'
 import PlayerManager from './PlayerManager'
-import AmbientLightSource from './lights/AmbientLight'
-import PointLightSource from './lights/PointLight'
 import { store } from '../Tools/Store'
 import { getRapier } from './Rapier'
 import { World as PhysicsWorld, EventQueue } from '@dimforge/rapier3d-compat'
@@ -66,9 +64,6 @@ export default class World {
 
 		this.setSize()
 
-		this.setAmbientLight()
-		this.setPointLight()
-
 		this.setAudioPlayer()
 
 		this.setPlayerManager()
@@ -104,17 +99,6 @@ export default class World {
 
 		this.totalHeight = 2 * Math.tan(vFov / 2) * cameraZ
 		this.totalWidth = this.totalHeight * aspect
-	}
-
-	// LIGHTS
-
-	setAmbientLight() {
-		this.ambientlight = new AmbientLightSource()
-		this.container.add(this.ambientlight.container)
-	}
-	setPointLight() {
-		this.light = new PointLightSource()
-		this.container.add(this.light.container)
 	}
 
 	// AUDIO

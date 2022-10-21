@@ -4,12 +4,13 @@ import { EffectComposer } from './PostProcess/EffectComposer'
 import { GammaCorrectionShader } from 'three/examples/jsm/shaders/GammaCorrectionShader.js'
 import { Scene, sRGBEncoding, WebGLRenderer, ShaderMaterial } from 'three'
 
+import AmbientLightSource from './World/lights/AmbientLight'
+import PointLightSource from './World/lights/PointLight'
+
 import Camera from './Camera'
 import World from './World'
 
 import { store } from './Tools/Store'
-
-import Keyboard from './Tools/Keyboard'
 
 import dangerVertShader from '../shaders/dangerVert.glsl'
 import dangerFragShader from '../shaders/dangerFrag.glsl'
@@ -32,15 +33,11 @@ export default class App {
 		this.setRenderer()
 		this.setCamera()
 		this.setPostProcessing()
-		this.initEvents()
 		this.setWorld()
+		this.setLights()
 
 		// UI
 		this.setScreens()
-	}
-
-	initEvents() {
-		this.keyboard = new Keyboard()
 	}
 
 	setRenderer() {
@@ -124,6 +121,15 @@ export default class App {
 		})
 		// Add world to scene
 		this.scene.add(this.world.container)
+	}
+
+	setLights() {
+		// LIGHTS
+		this.ambientlight = new AmbientLightSource()
+		this.scene.add(this.ambientlight.container)
+
+		this.light = new PointLightSource()
+		this.scene.add(this.light.container)
 	}
 
 	setScreens() {
