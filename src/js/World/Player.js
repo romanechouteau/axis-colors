@@ -114,6 +114,8 @@ export default class Player {
 		this.a_jump = this.mixer.clipAction(this.jumpAnim)
 		this.jumpSitAnim = AnimationClip.findByName(animations, 'jumpsit')
 		this.a_jumpSit = this.mixer.clipAction(this.jumpSitAnim)
+		this.sitAnim = AnimationClip.findByName(animations, 'sitREST')
+		this.a_sit = this.mixer.clipAction(this.sitAnim)
 	}
 
 	initPosition() {
@@ -232,6 +234,9 @@ export default class Player {
 				.play()
 		} else if (position.x === 0 && position.y === 0) {
 			animation.fadeOut(100).stop()
+			if (this.isFusion && this.id !== 1) {
+				this.a_sit.fadeIn(100).play()
+			}
 		}
 
 		this.velocity.x = position.x * this.speed
@@ -271,6 +276,10 @@ export default class Player {
 					this.fusionEvent.trigger('fusion')
 					this.isFusion = true
 
+					if (this.id !== 1) {
+						this.a_sit.fadeIn(100).play()
+					}
+
 					this.playerBody.setTranslation({
 						x: 0,
 						y: 0,
@@ -305,6 +314,7 @@ export default class Player {
 					this.isFusion = false
 					this.defineFootColor()
 
+					this.a_sit.stop()
 					this.a_jumpSit.stop()
 					this.a_walkSit.stop()
 
