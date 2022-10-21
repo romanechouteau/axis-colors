@@ -5,7 +5,7 @@ import { store } from '../Tools/Store'
 
 class LivesManager {
 	constructor() {
-		this.lives = 2
+		this.lives = 3
 		this.lifeEvent = new Emitter()
 		this.setLeaderBoard()
 
@@ -29,7 +29,7 @@ class LivesManager {
 	}
 
 	handleLooseLife = (lives) => {
-		console.log('looseLife', lives)
+		document.querySelector(`.lives_${lives + 1}`).classList.add('is-hidden')
 		if (lives === 0) this.endGame()
 	}
 
