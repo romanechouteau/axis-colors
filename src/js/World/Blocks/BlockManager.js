@@ -1,4 +1,4 @@
-import { Object3D, Vector3 } from 'three'
+import { Object3D, Vector3, MeshStandardMaterial } from 'three'
 
 import Block, {
 	BLOCK_DIMENSIONS,
@@ -7,6 +7,18 @@ import Block, {
 	BLOCK_TYPE_LIST,
 	BLOCK_WIDTH,
 } from './Block'
+
+// COLORS
+const TUNNEL_COLORS = {
+	1: 0xa4c9e7,
+	2: 0xe79ebe,
+}
+const BUTTON_COLOR = 0xac78ff
+const PLATFORM_COLORS = {
+	0: 0xac78ff,
+	1: 0x5deff,
+	2: 0xffafd2,
+}
 
 export default class BlockManager {
 	constructor(options) {
@@ -24,11 +36,15 @@ export default class BlockManager {
 		this.container = new Object3D()
 		this.currentX = 0
 		this.blocks = []
+		this.nextGenerate = 0
 
 		this.init()
 	}
 
+	// INITIALIZERS
+
 	init() {
+		this.initMaterials()
 		this.initBlocks()
 
 		this.time.on('tick', this.render)
@@ -38,6 +54,58 @@ export default class BlockManager {
 		this.currentX = -this.totalWidth
 		this.generateBlocks()
 	}
+
+	initMaterials() {
+		this.floorMaterial = new MeshStandardMaterial({
+			color: 0xe79fad,
+			emissive: 0x000000,
+			envMap: this.hdr,
+			envMapIntensity: 1,
+			metalness: 1,
+			roughness: 0.3,
+		})
+
+		this.buttonMaterial = new MeshStandardMaterial({
+			color: BUTTON_COLOR,
+			emissive: 0x000000,
+			roughness: 1,
+      metalness: 1
+		})
+
+		this.tunnelMaterials = []
+		this.platformMaterials = []
+
+		for (let i = 0; i <= 2; i++) {
+			const platformMaterial = new MeshStandardMaterial({
+				color: PLATFORM_COLORS[i],
+				emissive: 0x000000,
+				metalness: 1,
+				roughness: 0,
+				envMap: this.hdr,
+			})
+			this.platformMaterials[i] = platformMaterial
+
+			if (i === 0) continue
+			const tunnelMaterial = new MeshStandardMaterial({
+				color: TUNNEL_COLORS[i],
+				metalness: 1,
+				roughness: 0,
+				envMap: this.hdr,
+				transparent: true,
+				opacity: 0.7,
+			})
+			this.tunnelMaterials[i] = tunnelMaterial
+		}
+
+		this.materials = {
+			floorMaterial: this.floorMaterial,
+			buttonMaterial: this.buttonMaterial,
+			tunnelMaterials: this.tunnelMaterials,
+			platformMaterials: this.platformMaterials
+		}
+	}
+
+	// GENERATORS
 
 	generateType(first) {
 		if (first) return BLOCK_TYPE.normal
@@ -85,6 +153,7 @@ export default class BlockManager {
 
 	generateBlocks() {
 		const maxX = this.totalWidth * 2
+		this.nextGenerate = this.currentX - this.totalWidth
 
 		while (this.worldPosition.x + this.currentX <= maxX) {
 			const type = this.generateType(this.currentX <= BLOCK_WIDTH * 2)
@@ -98,7 +167,7 @@ export default class BlockManager {
 				physicsWorld: this.physicsWorld,
 				playerManager: this.playerManager,
 				dangerManager: this.dangerManager,
-				hdr: this.hdr,
+				materials: this.materials,
 			})
 
 			this.container.add(block.container)
@@ -107,6 +176,8 @@ export default class BlockManager {
 			this.blocks.push(block)
 		}
 	}
+
+	// DESTROY
 
 	destroyBlocks() {
 		let x = this.blocks[0].position.x + this.blocks[0].width
@@ -121,10 +192,12 @@ export default class BlockManager {
 		}
 	}
 
-	render = () => {
-		if (this.worldPosition.x + this.currentX >= this.totalWidth * 2) return
+	// RENDER
 
-		this.generateBlocks()
+	render = () => {
 		this.destroyBlocks()
+
+		if (-this.worldPosition.x < this.nextGenerate) return
+		this.generateBlocks()
 	}
 }

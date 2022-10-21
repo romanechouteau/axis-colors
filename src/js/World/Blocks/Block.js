@@ -1,7 +1,6 @@
 import {
 	BoxGeometry,
 	Mesh,
-	MeshStandardMaterial,
 	Object3D,
 } from 'three'
 import { ColliderDesc, RigidBodyDesc } from '@dimforge/rapier3d-compat'
@@ -49,18 +48,6 @@ export const BLOCK_WIDTH = 1
 export const BLOCK_DEPTH = 3
 export const BLOCK_HEIGHT = 2
 
-// COLORS
-const TUNNEL_COLORS = {
-	1: 0xa4c9e7,
-	2: 0xe79ebe,
-}
-const BUTTON_COLOR = 0xac78ff
-const PLATFORM_COLORS = {
-	0: 0xac78ff,
-	1: 0x5deff,
-	2: 0xffafd2,
-}
-
 export default class Block {
 	constructor(options) {
 		this.type = options.type
@@ -68,6 +55,7 @@ export default class Block {
 		this.assets = options.assets
 		this.listener = options.listener
 		this.position = options.position
+		this.materials = options.materials
 		this.physicsWorld = options.physicsWorld
 		this.dangerManager = options.dangerManager
 		this.playerManager = options.playerManager
@@ -87,8 +75,6 @@ export default class Block {
 			this.position.y,
 			this.position.z
 		)
-
-		this.initMaterials()
 
 		switch (this.type) {
 			case BLOCK_TYPE.normal:
@@ -117,49 +103,6 @@ export default class Block {
 
 	// BLOCK INITIALIZERS
 
-	initMaterials() {
-		this.floorMaterial = new MeshStandardMaterial({
-			color: 0xe79fad,
-			emissive: 0x000000,
-			envMap: this.hdr,
-			envMapIntensity: 1,
-			metalness: 1,
-			roughness: 0.3,
-		})
-
-		this.buttonMaterial = new MeshStandardMaterial({
-			color: BUTTON_COLOR,
-			emissive: 0x000000,
-			roughness: 1,
-      metalness: 1
-		})
-
-		this.tunnelMaterials = []
-		this.platformMaterials = []
-
-		for (let i = 0; i <= 2; i++) {
-			const platformMaterial = new MeshStandardMaterial({
-				color: PLATFORM_COLORS[i],
-				emissive: 0x000000,
-				metalness: 1,
-				roughness: 0,
-				envMap: this.hdr,
-			})
-			this.platformMaterials[i] = platformMaterial
-
-			if (i === 0) continue
-			const tunnelMaterial = new MeshStandardMaterial({
-				color: TUNNEL_COLORS[i],
-				metalness: 1,
-				roughness: 0,
-				envMap: this.hdr,
-				transparent: true,
-				opacity: 0.7,
-			})
-			this.tunnelMaterials[i] = tunnelMaterial
-		}
-	}
-
 	initNormal() {
 		this.createFloor()
 	}
@@ -179,10 +122,9 @@ export default class Block {
 				assets: this.assets,
 				isLeft: i === 1 ? isLeft : !isLeft,
 				isLoop,
-				material: this.tunnelMaterials[i],
+				material: this.materials.tunnelMaterials[i],
 				listener: this.listener,
 				physicsWorld: this.physicsWorld,
-				hdr: this.hdr,
 			})
 
 			this.tunnels.push(tunnel)
@@ -209,7 +151,7 @@ export default class Block {
 				assets: this.assets,
 				isLeft: i === 1 ? isLeft : !isLeft,
 				isDouble,
-				material: this.platformMaterials[isCenter ? 0 : i],
+				material: this.materials.platformMaterials[isCenter ? 0 : i],
 				isCenter: isCenter,
 				physicsWorld: this.physicsWorld,
 			})
@@ -240,7 +182,7 @@ export default class Block {
 			isLeft: Math.random() > 0.5,
 			isCenter: Math.random() > 0.5,
 			listener: this.listener,
-			material: this.buttonMaterial,
+			material: this.materials.buttonMaterial,
 			dangerManager: this.dangerManager,
 		})
 
@@ -257,7 +199,7 @@ export default class Block {
 	createFloor() {
 		const geometry = new BoxGeometry(this.width, BLOCK_HEIGHT, BLOCK_DEPTH)
 
-		const cube = new Mesh(geometry, this.floorMaterial)
+		const cube = new Mesh(geometry, this.materials.floorMaterial)
 		this.container.add(cube)
 
 		const rigidBody = RigidBodyDesc.fixed().setTranslation(
